@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Holcim UK Customer Feedback">
+    <meta name="theme-color" content="#1d4370">
+    
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    
+    <title>Customer Feedback | Holcim UK</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --holcim-blue: #1d4370;
+            --holcim-green: #94c12e;
+            --holcim-cyan: #04bbf1;
+            --holcim-teal: #00a19a;
+            --holcim-gradient: linear-gradient(135deg, #1d4370 0%, #04bbf1 50%, #94c12e 100%);
+            --surface: #ffffff;
+            --background: #f4f6f8;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a68;
+            --text-muted: #8888a0;
+            --border: #e2e6eb;
+            --border-light: #f0f2f5;
+            --error: #dc2626;
+            --star-empty: #d1d5db;
+            --star-filled: #fbbf24;
+            --star-hover: #fcd34d;
+            --shadow: 0 20px 50px rgba(29, 67, 112, 0.12);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --transition: 0.2s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container { width: 100%; max-width: 520px; }
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            animation: slideUp 0.4s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .header {
+            background: var(--holcim-gradient);
+            padding: 28px 24px 24px;
+            text-align: center;
+        }
+        .logo-container { margin-bottom: 12px; }
+        .holcim-logo { 
+            height: 50px; 
+            width: auto; 
+            filter: brightness(0) invert(1);
+        }
+        .header-title { color: #ffffff; font-size: 18px; font-weight: 600; margin-top: 8px; }
+        .header-accent {
+            height: 3px;
+            background: linear-gradient(90deg, var(--holcim-green), var(--holcim-cyan), var(--holcim-blue));
+        }
+        .form-body { padding: 24px; }
+        .form-section { margin-bottom: 24px; }
+        .form-section:last-of-type { margin-bottom: 20px; }
+        .section-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .required { color: var(--error); font-size: 12px; }
+        .optional { color: var(--text-muted); font-weight: 400; font-size: 12px; }
+        .rating-container {
+            background: var(--border-light);
+            border-radius: var(--radius);
+            padding: 16px 8px;
+        }
+        .star-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+        .star-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform var(--transition);
+            flex-shrink: 0;
+        }
+        .star-btn:hover { transform: scale(1.1); }
+        .star-btn:active { transform: scale(0.95); }
+        
+        /* NPS Stars (11 stars: 0-10) */
+        .star-row.nps-stars .star-btn svg { width: 28px; height: 28px; }
+        
+        /* Ease Stars (5 stars: 1-5) */
+        .star-row.ease-stars .star-btn svg { width: 36px; height: 36px; }
+        .star-row.ease-stars .star-btn { padding: 4px; }
+        
+        .star-btn svg { transition: all var(--transition); }
+        .star-btn .star-fill { fill: var(--star-empty); transition: fill var(--transition); }
+        .star-btn.active .star-fill, .star-btn.hovered .star-fill { fill: var(--star-filled); }
+        .star-btn.hovered .star-fill { fill: var(--star-hover); }
+        .star-btn.active svg { filter: drop-shadow(0 2px 4px rgba(251, 191, 36, 0.4)); }
+        .star-num {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 1px;
+            transition: color var(--transition);
+        }
+        .star-btn.active .star-num { color: var(--star-filled); }
+        @keyframes pop {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        .star-btn.pop { animation: pop 0.25s ease; }
+        .rating-labels { display: flex; justify-content: space-between; margin-top: 8px; padding: 0 4px; }
+        .rating-label { font-size: 11px; color: var(--text-muted); }
+        .rating-badge { text-align: center; margin-top: 10px; min-height: 26px; }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 16px;
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: all 0.25s ease;
+        }
+        .badge.show { opacity: 1; transform: translateY(0); }
+        .badge.detractor { background: #fef2f2; color: #dc2626; }
+        .badge.passive { background: #fffbeb; color: #d97706; }
+        .badge.promoter { background: #ecfdf5; color: #059669; }
+        .badge.ease { background: rgba(4, 187, 241, 0.1); color: var(--holcim-blue); }
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 15px;
+            color: var(--text-primary);
+            background: var(--surface);
+            transition: all var(--transition);
+        }
+        .form-input:hover { border-color: #c5ccd4; }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--holcim-cyan);
+            box-shadow: 0 0 0 3px rgba(4, 187, 241, 0.15);
+        }
+        .form-input::placeholder { color: var(--text-muted); }
+        .form-input.error { border-color: var(--error); }
+        textarea.form-input { resize: vertical; min-height: 80px; }
+        .error-msg { font-size: 12px; color: var(--error); margin-top: 4px; display: none; }
+        .form-section.has-error .error-msg { display: block; }
+        .submit-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--holcim-gradient);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(29, 67, 112, 0.25); }
+        .submit-btn:active { transform: translateY(0); }
+        .submit-btn:disabled { background: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-inner { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+        .submit-btn.loading .spinner { display: block; }
+        .submit-btn.loading .btn-text { display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .security-note svg { width: 12px; height: 12px; color: var(--holcim-teal); }
+        .success-view { display: none; text-align: center; padding: 48px 24px; }
+        .success-view.show { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .success-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, rgba(4, 187, 241, 0.12), rgba(148, 193, 46, 0.12));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .success-icon svg { width: 36px; height: 36px; color: var(--holcim-teal); }
+        .success-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .success-msg { color: var(--text-secondary); font-size: 14px; }
+        .form-view.hidden { display: none; }
+        .footer {
+            text-align: center;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-light);
+            background: var(--background);
+        }
+        .footer-text { font-size: 11px; color: var(--text-muted); }
+        .hp { position: absolute; left: -9999px; opacity: 0; height: 0; pointer-events: none; }
+        
+        /* Responsive - keep stars in one row */
+        @media (max-width: 480px) {
+            body { padding: 12px; align-items: flex-start; padding-top: 16px; }
+            .card { border-radius: 16px; }
+            .header { padding: 20px 16px 18px; }
+            .holcim-logo { height: 40px; }
+            .header-title { font-size: 16px; }
+            .form-body { padding: 20px 16px; }
+            .rating-container { padding: 12px 4px; }
+            .star-row.nps-stars .star-btn svg { width: 24px; height: 24px; }
+            .star-row.nps-stars .star-btn { padding: 1px; }
+            .star-num { font-size: 8px; }
+            .star-row.ease-stars .star-btn svg { width: 32px; height: 32px; }
+        }
+        
+        @media (max-width: 360px) {
+            .star-row.nps-stars .star-btn svg { width: 20px; height: 20px; }
+            .star-row.ease-stars .star-btn svg { width: 28px; height: 28px; }
+            .star-num { font-size: 7px; }
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --surface: #1a1d24;
+                --background: #0d0f12;
+                --text-primary: #f0f2f5;
+                --text-secondary: #a0a8b4;
+                --text-muted: #6b7280;
+                --border: #2d333b;
+                --border-light: #21262d;
+                --star-empty: #3d4450;
+            }
+            .footer { background: var(--surface); }
+            .rating-container { background: var(--border-light); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <header class="header">
+                <div class="logo-container">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Holcim_Logo_2021_sRGB.png" 
+                         alt="Holcim" 
+                         class="holcim-logo">
+                </div>
+                <p class="header-title">Customer Service Feedback</p>
+            </header>
+            <div class="header-accent"></div>
+
+            <div class="form-view" id="formView">
+                <div class="form-body">
+                    <form id="csatForm" novalidate>
+                        <div class="hp" aria-hidden="true">
+                            <input type="text" name="website" id="hp" tabindex="-1" autocomplete="off">
+                        </div>
+                        <input type="hidden" id="ts" name="_ts" value="">
+                        <input type="hidden" id="token" name="_token" value="">
+
+                        <div class="form-section">
+                            <label class="section-label">
+                                How likely are you to recommend Holcim UK to a colleague? <span class="required">*</span>
+                            </label>
+                            <div class="rating-container">
+                                <div class="star-row nps-stars" id="npsStars" role="group" aria-label="NPS rating"></div>
+                                <div class="rating-labels">
+                                    <span class="rating-label">Not likely</span>
+                                    <span class="rating-label">Extremely likely</span>
+                                </div>
+                                <div class="rating-badge">
+                                    <span class="badge" id="npsBadge"></span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="npsScore" name="nps_score" value="">
+                        </div>
+
+                        <div class="form-section">
+                            <label class="section-label">
+                                How easy was it to resolve your inquiry today? <span class="required">*</span>
+                            </label>
+                            <div class="rating-container">
+                                <div class="star-row ease-stars" id="easeStars" role="group" aria-label="Ease rating"></div>
+                                <div class="rating-labels">
+                                    <span class="rating-label">Very Difficult</span>
+                                    <span class="rating-label">Very Easy</span>
+                                </div>
+                                <div class="rating-badge">
+                                    <span class="badge ease" id="easeBadge"></span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="easeScore" name="ease_score" value="">
+                        </div>
+
+                        <div class="form-section" id="emailSection">
+                            <label class="section-label" for="email">
+                                Your email address <span class="required">*</span>
+                            </label>
+                            <input type="email" id="email" name="email" class="form-input" 
+                                   placeholder="name@company.com" autocomplete="email" inputmode="email" required>
+                            <p class="error-msg">Please enter a valid email address</p>
+                        </div>
+
+                        <div class="form-section">
+                            <label class="section-label" for="orderRef">
+                                Order/Shipment Number <span class="optional">(optional)</span>
+                            </label>
+                            <input type="text" id="orderRef" name="order_ref" class="form-input" 
+                                   placeholder="e.g. CS-12345" autocomplete="off">
+                        </div>
+
+                        <div class="form-section">
+                            <label class="section-label" for="feedback">
+                                What could we do better? <span class="optional">(optional)</span>
+                            </label>
+                            <textarea id="feedback" name="feedback_text" class="form-input" 
+                                      placeholder="Share your thoughts..." 
+                                      maxlength="1000"></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <span class="btn-inner">
+                                <span class="btn-text">Submit Feedback</span>
+                                <span class="spinner"></span>
+                            </span>
+                        </button>
+
+                        <div class="security-note">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                <path d="M9 12l2 2 4-4"/>
+                            </svg>
+                            <span>Your feedback is confidential</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="success-view" id="successView">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h2 class="success-title">Thank you!</h2>
+                <p class="success-msg">Your feedback has been submitted successfully.<br>We appreciate you taking the time to help us improve.</p>
+            </div>
+
+            <footer class="footer">
+                <p class="footer-text">© 2026 Holcim UK. Your feedback is confidential.</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+        // CONFIG: Your live Ngrok tunnel URL
+        const CONFIG = { 
+            API: 'https://mesne-unpreclusively-dana.ngrok-free.dev/submit', 
+            MIN_TIME: 2000, 
+            MAX_SUBMITS: 5 
+        };
+        
+        const state = { nps: null, ease: null, loadTime: Date.now(), submits: parseInt(sessionStorage.getItem('_cs') || '0') };
+
+        const genToken = () => {
+            const a = new Uint8Array(20);
+            crypto.getRandomValues(a);
+            return Array.from(a, b => b.toString(16).padStart(2, '0')).join('');
+        };
+        const sanitize = s => typeof s === 'string' ? s.replace(/[<>]/g, '').replace(/javascript:/gi, '').trim().slice(0, 1000) : s;
+        const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && e.length <= 254;
+        const starSVG = '<svg viewBox="0 0 24 24"><path class="star-fill" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+
+        function buildNPSStars() {
+            const c = document.getElementById('npsStars');
+            for (let i = 0; i <= 10; i++) {
+                const b = document.createElement('button');
+                b.type = 'button'; b.className = 'star-btn'; b.dataset.value = i;
+                b.setAttribute('aria-label', i + ' out of 10');
+                b.innerHTML = starSVG + '<span class="star-num">' + i + '</span>';
+                c.appendChild(b);
+            }
+        }
+
+        function buildEaseStars() {
+            const c = document.getElementById('easeStars');
+            for (let i = 1; i <= 5; i++) {
+                const b = document.createElement('button');
+                b.type = 'button'; b.className = 'star-btn'; b.dataset.value = i;
+                b.setAttribute('aria-label', i + ' out of 5');
+                b.innerHTML = starSVG;
+                c.appendChild(b);
+            }
+        }
+
+        function setupNPS() {
+            const c = document.getElementById('npsStars'), h = document.getElementById('npsScore'), badge = document.getElementById('npsBadge');
+            const btns = c.querySelectorAll('.star-btn');
+            const getCategory = v => v <= 6 ? { label: 'Detractor', class: 'detractor' } : v <= 8 ? { label: 'Passive', class: 'passive' } : { label: 'Promoter', class: 'promoter' };
+            const update = (val, hover = false) => {
+                btns.forEach(b => {
+                    const v = +b.dataset.value;
+                    b.classList.toggle('active', !hover && v <= val);
+                    b.classList.toggle('hovered', hover && v <= val);
+                });
+            };
+            btns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const v = +btn.dataset.value;
+                    state.nps = v; h.value = v; update(v);
+                    btn.classList.add('pop'); setTimeout(() => btn.classList.remove('pop'), 250);
+                    const cat = getCategory(v);
+                    badge.className = 'badge show ' + cat.class;
+                    badge.textContent = v + '/10 · ' + cat.label;
+                });
+                btn.addEventListener('mouseenter', () => update(+btn.dataset.value, true));
+                btn.addEventListener('mouseleave', () => update(state.nps !== null ? state.nps : -1));
+            });
+        }
+
+        function setupEase() {
+            const c = document.getElementById('easeStars'), h = document.getElementById('easeScore'), badge = document.getElementById('easeBadge');
+            const btns = c.querySelectorAll('.star-btn');
+            const labels = ['Very Difficult', 'Difficult', 'Neutral', 'Easy', 'Very Easy'];
+            const update = (val, hover = false) => {
+                btns.forEach(b => {
+                    const v = +b.dataset.value;
+                    b.classList.toggle('active', !hover && v <= val);
+                    b.classList.toggle('hovered', hover && v <= val);
+                });
+            };
+            btns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const v = +btn.dataset.value;
+                    state.ease = v; h.value = v; update(v);
+                    btn.classList.add('pop'); setTimeout(() => btn.classList.remove('pop'), 250);
+                    badge.className = 'badge ease show';
+                    badge.textContent = labels[v - 1];
+                });
+                btn.addEventListener('mouseenter', () => update(+btn.dataset.value, true));
+                btn.addEventListener('mouseleave', () => update(state.ease || 0));
+            });
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Validation
+            if (document.getElementById('hp').value) { showSuccess(); return; }
+            if (Date.now() - state.loadTime < CONFIG.MIN_TIME) { alert('Please take a moment to review the form.'); return; }
+            
+            const email = document.getElementById('email'), emailSection = document.getElementById('emailSection');
+            if (!validEmail(email.value)) {
+                email.classList.add('error'); emailSection.classList.add('has-error'); email.focus(); return;
+            }
+            if (state.nps === null || state.ease === null) { alert('Please complete the star ratings.'); return; }
+
+            // Data Payload
+           // Inside handleSubmit function, update the data object:
+const data = {
+    type: urlParams.get('type') || 'General',
+    lob: urlParams.get('lob') || 'Standard', // Captures Asphalt, RMX, Cement, etc.
+    email: sanitize(email.value),
+    orderRef: sanitize(document.getElementById('orderRef').value),
+    nps: state.nps,
+    ease: state.ease,
+    feedback: sanitize(document.getElementById('feedback').value)
+};
+
+            btn.disabled = true; btn.classList.add('loading');
+
+            try {
+                const response = await fetch(CONFIG.API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    state.submits++; 
+                    sessionStorage.setItem('_cs', state.submits);
+                    showSuccess();
+                } else { throw new Error('Server error'); }
+            } catch (err) {
+                alert('Connection Error: Please ensure your Python script is running.');
+                btn.disabled = false; btn.classList.remove('loading');
+            }
+        }
+
+        function showSuccess() {
+            document.getElementById('formView').classList.add('hidden');
+            document.getElementById('successView').classList.add('show');
+        }
+
+       function init() {
+    document.getElementById('token').value = genToken();
+    document.getElementById('ts').value = Date.now();
+    buildNPSStars(); buildEaseStars(); setupNPS(); setupEase();
+    document.getElementById('csatForm').addEventListener('submit', handleSubmit);
+
+    // DYNAMIC UI LOGIC
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type')?.toLowerCase();
+    const title = document.querySelector('.header-title');
+    const easeLabel = document.querySelector('.ease-stars').previousElementSibling;
+
+    if (type === 'delivery') {
+        title.textContent = 'Delivery Feedback';
+        easeLabel.innerHTML = 'How easy was it to receive this delivery? <span class="required">*</span>';
+    } else if (type === 'invoice') {
+        title.textContent = 'Invoice Feedback';
+        easeLabel.innerHTML = 'How easy was it to process this invoice? <span class="required">*</span>';
+    } else if (type === 'quote') {
+        title.textContent = 'Quote Feedback';
+        easeLabel.innerHTML = 'How easy was it to get this quote? <span class="required">*</span>';
+    }
+}
+
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
+        else { init(); }
+    })();
+    </script>
+    </script>
+</body>
+</html>
