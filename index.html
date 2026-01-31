@@ -561,26 +561,25 @@ const data = {
         }
 
        function init() {
-    document.getElementById('token').value = genToken();
-    document.getElementById('ts').value = Date.now();
-    buildNPSStars(); buildEaseStars(); setupNPS(); setupEase();
-    document.getElementById('csatForm').addEventListener('submit', handleSubmit);
+    // ... (keep your existing build stars and setup logic) ...
 
-    // DYNAMIC UI LOGIC
     const params = new URLSearchParams(window.location.search);
-    const type = params.get('type')?.toLowerCase();
+    const type = (params.get('type') || 'service').toLowerCase();
+    
+    // Select the label specifically for the Ease question
+    // It is the label inside the section before the stars
     const title = document.querySelector('.header-title');
-    const easeLabel = document.querySelector('.ease-stars').previousElementSibling;
+    const easeLabel = document.querySelector('.form-section:nth-of-type(2) .section-label');
 
     if (type === 'delivery') {
         title.textContent = 'Delivery Feedback';
-        easeLabel.innerHTML = 'How easy was it to receive this delivery? <span class="required">*</span>';
+        if (easeLabel) easeLabel.innerHTML = 'How easy was it to receive this delivery? <span class="required">*</span>';
     } else if (type === 'invoice') {
         title.textContent = 'Invoice Feedback';
-        easeLabel.innerHTML = 'How easy was it to process this invoice? <span class="required">*</span>';
+        if (easeLabel) easeLabel.innerHTML = 'How easy was it to process this invoice? <span class="required">*</span>';
     } else if (type === 'quote') {
         title.textContent = 'Quote Feedback';
-        easeLabel.innerHTML = 'How easy was it to get this quote? <span class="required">*</span>';
+        if (easeLabel) easeLabel.innerHTML = 'How easy was it to get this quote? <span class="required">*</span>';
     }
 }
 
