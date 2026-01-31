@@ -10,7 +10,6 @@
             --holcim-blue: #1d4370;
             --holcim-green: #94c12e;
             --holcim-cyan: #04bbf1;
-            --holcim-teal: #00a19a;
             --holcim-gradient: linear-gradient(135deg, #1d4370 0%, #04bbf1 50%, #94c12e 100%);
             --surface: #ffffff;
             --background: #f4f6f8;
@@ -21,17 +20,19 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--background); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
         .container { width: 100%; max-width: 520px; }
-        .card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 20px 50px rgba(29,67,112,0.12); overflow: hidden; }
+        .card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 20px 50px rgba(29, 67, 112, 0.12); overflow: hidden; }
         .header { background: var(--holcim-gradient); padding: 28px; text-align: center; color: white; }
         .holcim-logo { height: 50px; filter: brightness(0) invert(1); margin-bottom: 10px; }
         .form-body { padding: 24px; }
         .form-section { margin-bottom: 24px; }
         .section-label { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: block; }
         .rating-container { background: #f0f2f5; border-radius: 12px; padding: 16px; text-align: center; }
-        .star-row { display: flex; justify-content: center; gap: 4px; }
-        .star-btn { background: none; border: none; cursor: pointer; padding: 2px; }
-        .star-btn svg { width: 28px; height: 28px; fill: #d1d5db; transition: 0.2s; }
+        .star-row { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+        .star-btn { background: none; border: none; cursor: pointer; padding: 2px; transition: transform 0.2s; }
+        .star-btn:hover { transform: scale(1.2); }
+        .star-btn svg { width: 24px; height: 24px; fill: #d1d5db; transition: 0.2s; }
         .star-btn.active svg { fill: #fbbf24; }
+        .star-num { font-size: 10px; color: #888; display: block; margin-top: 2px; }
         .badge { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 16px; background: #ecfdf5; color: #059669; opacity: 0; }
         .badge.show { opacity: 1; }
         .form-input { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 12px; margin-top: 4px; font-family: inherit; }
@@ -40,7 +41,6 @@
         .success-view.show { display: block; }
         .hidden { display: none; }
         .required { color: #dc2626; }
-        .hp { position: absolute; left: -9999px; opacity: 0; }
     </style>
 </head>
 <body>
@@ -48,12 +48,11 @@
         <div class="card">
             <header class="header">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Holcim_Logo_2021_sRGB.png" alt="Holcim" class="holcim-logo">
-                <p class="header-title">Customer Service Feedback</p>
+                <p class="header-title">Customer Feedback</p>
             </header>
 
             <div id="formView" class="form-body">
                 <form id="csatForm" novalidate>
-                    <div class="hp"><input type="text" id="hp"></div>
                     <div class="form-section">
                         <label class="section-label">How likely are you to recommend Holcim UK to a colleague? <span class="required">*</span></label>
                         <div class="rating-container">
@@ -63,7 +62,7 @@
                     </div>
 
                     <div class="form-section">
-                        <label class="section-label">How easy was it to resolve your inquiry today? <span class="required">*</span></label>
+                        <label class="section-label" id="easeLabel">How easy was it to resolve your inquiry today? <span class="required">*</span></label>
                         <div class="rating-container">
                             <div class="star-row" id="easeStars"></div>
                             <div class="badge" id="easeBadge">Selected</div>
@@ -76,7 +75,7 @@
                     </div>
 
                     <div class="form-section">
-                        <label class="section-label">Reference Number (optional)</label>
+                        <label class="section-label">Order/Shipment Number (optional)</label>
                         <input type="text" id="orderRef" class="form-input" placeholder="e.g. ORD-12345">
                     </div>
 
@@ -91,7 +90,7 @@
 
             <div id="successView" class="success-view">
                 <h2 style="margin-bottom:10px;">Thank You!</h2>
-                <p>Your feedback has been submitted successfully to the database.</p>
+                <p>Your feedback has been submitted successfully to our database.</p>
             </div>
         </div>
     </div>
@@ -99,21 +98,25 @@
     <script>
     (function() {
         'use strict';
-        const CONFIG = { API: 'https://mesne-unpreclusively-dana.ngrok-free.dev/submit', MIN_TIME: 2000 };
-        const state = { nps: null, ease: null, loadTime: Date.now() };
+        const CONFIG = { API: 'https://mesne-unpreclusively-dana.ngrok-free.dev/submit' };
+        const state = { nps: null, ease: null };
         const starSVG = '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
-        const sanitize = s => typeof s === 'string' ? s.replace(/[<>]/g, '').trim().slice(0, 1000) : s;
 
-        function buildStars(containerId, count, stateKey, badgeId) {
+        function buildStars(containerId, count, startAt0, stateKey, badgeId) {
             const container = document.getElementById(containerId);
-            for (let i = 1; i <= count; i++) {
+            for (let i = (startAt0 ? 0 : 1); i <= count; i++) {
                 const btn = document.createElement('button');
-                btn.type = 'button'; btn.className = 'star-btn'; btn.innerHTML = starSVG;
+                btn.type = 'button'; btn.className = 'star-btn'; 
+                btn.innerHTML = starSVG + `<span class="star-num">${i}</span>`;
                 btn.onclick = () => {
                     state[stateKey] = i;
-                    Array.from(container.children).forEach((s, idx) => s.classList.toggle('active', idx < i));
+                    const allButtons = Array.from(container.children);
+                    allButtons.forEach((s, idx) => {
+                        const val = parseInt(s.querySelector('.star-num').textContent);
+                        s.classList.toggle('active', val <= i);
+                    });
                     const b = document.getElementById(badgeId);
-                    b.classList.add('show'); b.textContent = i + '/' + count;
+                    b.classList.add('show'); b.textContent = i + (startAt0 ? '/10' : '/5');
                 };
                 container.appendChild(btn);
             }
@@ -121,18 +124,17 @@
 
         async function handleSubmit(e) {
             e.preventDefault();
-            if (document.getElementById('hp').value) return; 
             if (state.nps === null || state.ease === null) return alert('Please complete the star ratings.');
 
             const params = new URLSearchParams(window.location.search);
             const data = {
                 type: params.get('type') || 'Service',
                 lob: params.get('lob') || 'Standard',
-                email: sanitize(document.getElementById('email').value),
-                orderRef: sanitize(document.getElementById('orderRef').value),
+                email: document.getElementById('email').value,
+                orderRef: document.getElementById('orderRef').value,
                 nps: state.nps,
                 ease: state.ease,
-                feedback: sanitize(document.getElementById('feedback').value)
+                feedback: document.getElementById('feedback').value
             };
 
             const btn = document.getElementById('submitBtn');
@@ -149,21 +151,20 @@
                     document.getElementById('successView').classList.add('show');
                 } else { throw new Error(); }
             } catch (err) {
-                alert('Connection Error: Ensure Python is running.');
+                alert('Connection Error: Ensure Python is running on your laptop.');
                 btn.disabled = false; btn.textContent = 'Submit Feedback';
             }
         }
 
         function init() {
-            buildStars('npsStars', 10, 'nps', 'npsBadge');
-            buildStars('easeStars', 5, 'ease', 'easeBadge');
+            buildStars('npsStars', 10, true, 'nps', 'npsBadge');
+            buildStars('easeStars', 5, false, 'ease', 'easeBadge');
             document.getElementById('csatForm').addEventListener('submit', handleSubmit);
 
-            // DYNAMIC WORDING LOGIC
             const params = new URLSearchParams(window.location.search);
-            const type = (params.get('type') || 'service').toLowerCase();
+            const type = (params.get('type') || '').toLowerCase();
             const title = document.querySelector('.header-title');
-            const easeLabel = document.querySelector('.form-section:nth-of-type(2) .section-label');
+            const easeLabel = document.getElementById('easeLabel');
 
             if (type === 'delivery') {
                 title.textContent = 'Delivery Feedback';
@@ -176,7 +177,6 @@
                 easeLabel.innerHTML = 'How easy was it to get this quote? <span class="required">*</span>';
             }
         }
-
         init();
     })();
     </script>
