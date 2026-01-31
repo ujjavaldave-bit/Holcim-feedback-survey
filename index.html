@@ -8,19 +8,15 @@
     <style>
         :root {
             --holcim-blue: #1d4370;
-            --holcim-green: #94c12e;
-            --holcim-cyan: #04bbf1;
             --holcim-gradient: linear-gradient(135deg, #1d4370 0%, #04bbf1 50%, #94c12e 100%);
             --surface: #ffffff;
             --background: #f4f6f8;
             --text-primary: #1a1a2e;
             --border: #e2e6eb;
-            --radius-lg: 20px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--background); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
-        .container { width: 100%; max-width: 520px; }
-        .card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 20px 50px rgba(29, 67, 112, 0.12); overflow: hidden; }
+        .card { background: var(--surface); border-radius: 20px; box-shadow: 0 20px 50px rgba(29, 67, 112, 0.12); overflow: hidden; width: 100%; max-width: 520px; }
         .header { background: var(--holcim-gradient); padding: 28px; text-align: center; color: white; }
         .holcim-logo { height: 50px; filter: brightness(0) invert(1); margin-bottom: 10px; }
         .form-body { padding: 24px; }
@@ -28,10 +24,12 @@
         .section-label { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: block; }
         .rating-container { background: #f0f2f5; border-radius: 12px; padding: 16px; text-align: center; }
         .star-row { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
-        .star-btn { background: none; border: none; cursor: pointer; padding: 2px; transition: transform 0.2s; }
-        .star-btn:hover { transform: scale(1.2); }
-        .star-btn svg { width: 24px; height: 24px; fill: #d1d5db; transition: 0.2s; }
-        .star-btn.active svg { fill: #fbbf24; }
+        
+        /* STAR FUNCTIONALITY FIX */
+        .star-btn { background: none; border: none; cursor: pointer; padding: 2px; }
+        .star-btn svg { width: 26px; height: 26px; fill: #d1d5db; transition: 0.2s; }
+        .star-btn.active svg { fill: #fbbf24; } /* Glow effect */
+        
         .star-num { font-size: 10px; color: #888; display: block; margin-top: 2px; }
         .badge { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 16px; background: #ecfdf5; color: #059669; opacity: 0; }
         .badge.show { opacity: 1; }
@@ -44,54 +42,52 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <header class="header">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Holcim_Logo_2021_sRGB.png" alt="Holcim" class="holcim-logo">
-                <p class="header-title">Customer Feedback</p>
-            </header>
+    <div class="card">
+        <header class="header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Holcim_Logo_2021_sRGB.png" alt="Holcim" class="holcim-logo">
+            <p class="header-title">Customer Feedback</p>
+        </header>
 
-            <div id="formView" class="form-body">
-                <form id="csatForm" novalidate>
-                    <div class="form-section">
-                        <label class="section-label">How likely are you to recommend Holcim UK to a colleague? <span class="required">*</span></label>
-                        <div class="rating-container">
-                            <div class="star-row" id="npsStars"></div>
-                            <div class="badge" id="npsBadge">Selected</div>
-                        </div>
+        <div id="formView" class="form-body">
+            <form id="csatForm">
+                <div class="form-section">
+                    <label class="section-label" id="npsLabel">How likely are you to recommend Holcim UK to a colleague? <span class="required">*</span></label>
+                    <div class="rating-container">
+                        <div class="star-row" id="npsStars"></div>
+                        <div class="badge" id="npsBadge">Selected</div>
                     </div>
+                </div>
 
-                    <div class="form-section">
-                        <label class="section-label" id="easeLabel">How easy was it to resolve your inquiry today? <span class="required">*</span></label>
-                        <div class="rating-container">
-                            <div class="star-row" id="easeStars"></div>
-                            <div class="badge" id="easeBadge">Selected</div>
-                        </div>
+                <div class="form-section">
+                    <label class="section-label" id="easeLabel">How easy was it to resolve your inquiry today? <span class="required">*</span></label>
+                    <div class="rating-container">
+                        <div class="star-row" id="easeStars"></div>
+                        <div class="badge" id="easeBadge">Selected</div>
                     </div>
+                </div>
 
-                    <div class="form-section">
-                        <label class="section-label">Your email address <span class="required">*</span></label>
-                        <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
-                    </div>
+                <div class="form-section">
+                    <label class="section-label">Your email address <span class="required">*</span></label>
+                    <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
+                </div>
 
-                    <div class="form-section">
-                        <label class="section-label">Order/Shipment Number (optional)</label>
-                        <input type="text" id="orderRef" class="form-input" placeholder="e.g. ORD-12345">
-                    </div>
+                <div class="form-section">
+                    <label class="section-label">Reference Number (optional)</label>
+                    <input type="text" id="orderRef" class="form-input" placeholder="e.g. ORD-12345">
+                </div>
 
-                    <div class="form-section">
-                        <label class="section-label">What could we do better? (optional)</label>
-                        <textarea id="feedback" class="form-input" rows="3" placeholder="Share your thoughts..."></textarea>
-                    </div>
+                <div class="form-section">
+                    <label class="section-label">What could we do better? (optional)</label>
+                    <textarea id="feedback" class="form-input" rows="3" placeholder="Share your thoughts..."></textarea>
+                </div>
 
-                    <button type="submit" class="submit-btn" id="submitBtn">Submit Feedback</button>
-                </form>
-            </div>
+                <button type="submit" class="submit-btn" id="submitBtn">Submit Feedback</button>
+            </form>
+        </div>
 
-            <div id="successView" class="success-view">
-                <h2 style="margin-bottom:10px;">Thank You!</h2>
-                <p>Your feedback has been submitted successfully to our database.</p>
-            </div>
+        <div id="successView" class="success-view">
+            <h2>Thank You!</h2>
+            <p>Your feedback has been saved successfully.</p>
         </div>
     </div>
 
@@ -111,7 +107,7 @@
                 btn.onclick = () => {
                     state[stateKey] = i;
                     const allButtons = Array.from(container.children);
-                    allButtons.forEach((s, idx) => {
+                    allButtons.forEach(s => {
                         const val = parseInt(s.querySelector('.star-num').textContent);
                         s.classList.toggle('active', val <= i);
                     });
@@ -161,20 +157,24 @@
             buildStars('easeStars', 5, false, 'ease', 'easeBadge');
             document.getElementById('csatForm').addEventListener('submit', handleSubmit);
 
+            // DYNAMIC WORDING LOGIC
             const params = new URLSearchParams(window.location.search);
             const type = (params.get('type') || '').toLowerCase();
             const title = document.querySelector('.header-title');
+            const npsLabel = document.getElementById('npsLabel');
             const easeLabel = document.getElementById('easeLabel');
 
-            if (type === 'delivery') {
+            if (type === 'quote') {
+                title.textContent = 'Quote Feedback';
+                npsLabel.innerHTML = 'Based on this quote experience, how likely are you to recommend Holcim UK to a colleague? <span class="required">*</span>';
+                easeLabel.innerHTML = 'How easy was it to get this quote? <span class="required">*</span>';
+            } else if (type === 'delivery') {
                 title.textContent = 'Delivery Feedback';
+                npsLabel.innerHTML = 'Based on this delivery, how likely are you to recommend Holcim UK to a colleague? <span class="required">*</span>';
                 easeLabel.innerHTML = 'How easy was it to receive this delivery? <span class="required">*</span>';
             } else if (type === 'invoice') {
                 title.textContent = 'Invoice Feedback';
                 easeLabel.innerHTML = 'How easy was it to process this invoice? <span class="required">*</span>';
-            } else if (type === 'quote') {
-                title.textContent = 'Quote Feedback';
-                easeLabel.innerHTML = 'How easy was it to get this quote? <span class="required">*</span>';
             }
         }
         init();
