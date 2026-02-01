@@ -28,7 +28,7 @@
         .section-label { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: block; }
         .rating-container { background: #f0f2f5; border-radius: 12px; padding: 16px; text-align: center; }
         .star-row { display: flex; justify-content: center; gap: 4px; }
-        .star-btn { background: none; border: none; cursor: pointer; padding: 2px; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; }
+        .star-btn { background: none; border: none; cursor: pointer; padding: 2px; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
         .star-btn:hover { transform: scale(1.2); }
         .star-btn svg { width: 28px; height: 28px; transition: all 0.2s; }
         .star-fill { fill: var(--star-empty); }
@@ -43,7 +43,20 @@
         .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(29, 67, 112, 0.3); }
         .success-view { display: none; text-align: center; padding: 48px 24px; }
         .success-view.show { display: block; }
-        .hidden { display: none; }
+
+        /* MOBILE FIXES */
+        @media (max-width: 480px) {
+            body { padding: 12px; }
+            .card { border-radius: 16px; }
+            .form-body { padding: 16px; }
+            .star-row { gap: 1px !important; flex-wrap: nowrap !important; justify-content: space-between; }
+            #npsStars .star-btn svg { width: 22px !important; height: 22px !important; }
+            #npsStars .star-num { font-size: 8px; }
+            #easeStars .star-btn svg { width: 32px !important; height: 32px !important; }
+        }
+        @media (max-width: 340px) {
+            #npsStars .star-btn svg { width: 18px !important; height: 18px !important; }
+        }
     </style>
 </head>
 <body>
@@ -116,7 +129,6 @@
                 const btn = document.createElement('button');
                 btn.type = 'button'; btn.className = 'star-btn'; btn.dataset.val = i;
                 btn.innerHTML = starSVG + `<span class="star-num">${i}</span>`;
-                
                 btn.onclick = () => {
                     state[stateKey] = i;
                     btn.classList.add('pop'); setTimeout(() => btn.classList.remove('pop'), 300);
@@ -133,7 +145,6 @@
         document.getElementById('csatForm').onsubmit = async (e) => {
             e.preventDefault();
             if (state.nps === null || state.ease === null) return alert('Please complete the star ratings.');
-            
             const params = new URLSearchParams(window.location.search);
             const payload = {
                 type: params.get('type') || 'Service',
@@ -144,10 +155,8 @@
                 ease: state.ease,
                 feedback: document.getElementById('feedback').value
             };
-
             const btn = document.getElementById('submitBtn');
             btn.disabled = true; btn.textContent = 'Sending...';
-
             try {
                 const res = await fetch(CONFIG.API, {
                     method: 'POST',
@@ -155,7 +164,7 @@
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) {
-                    document.getElementById('formView').classList.add('hidden');
+                    document.getElementById('formView').style.display = 'none';
                     document.getElementById('successView').classList.add('show');
                 }
             } catch (err) {
