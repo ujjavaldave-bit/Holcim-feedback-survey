@@ -158,11 +158,14 @@
             const btn = document.getElementById('submitBtn');
             btn.disabled = true; btn.textContent = 'Sending...';
             try {
-                const res = await fetch(CONFIG.API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+             const res = await fetch(CONFIG.API, {
+    method: 'POST',
+    headers: { 
+        'Content-Type': 'application/json',
+        'X-API-KEY': 'Holcim-UK-Secure-2026' // This must match your Python key exactly
+    },
+    body: JSON.stringify(payload)
+});
                 if (res.ok) {
                     document.getElementById('formView').style.display = 'none';
                     document.getElementById('successView').classList.add('show');
