@@ -197,7 +197,6 @@
 
                 const picker = document.getElementById('languagePicker');
                 
-                // Add Placeholder
                 const placeholder = document.createElement('option');
                 placeholder.textContent = "Select your location...";
                 placeholder.value = "";
@@ -220,7 +219,6 @@
 
                 picker.onchange = (e) => updateUI(e.target.value);
 
-                // LOGIC: URL Params > IP Geo-Detect > Fallback English
                 const params = new URLSearchParams(window.location.search);
                 const urlLang = params.get('lang');
 
