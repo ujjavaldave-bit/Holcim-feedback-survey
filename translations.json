@@ -152,6 +152,7 @@
         }
 
         function updateUI(langCode) {
+            if (!langCode) return;
             const t = state.globalData.languages[langCode] || state.globalData.languages['en'];
             const params = new URLSearchParams(window.location.search);
             const type = (params.get('type') || '').toLowerCase();
@@ -160,7 +161,6 @@
             let npsText = t.nps_q;
             let easeText = t.ease_q;
 
-            // Context-Aware Logic
             if (type === 'quote') {
                 headerText = t.header_quote || t.header;
                 npsText = t.nps_q_quote || t.nps_q;
@@ -175,7 +175,6 @@
                 easeText = t.ease_q_invoice || t.ease_q;
             }
 
-            // Apply translations and keep Red Asterisk for required fields
             document.querySelector('.header-title').textContent = headerText;
             document.getElementById('npsLabel').innerHTML = `${npsText} <span style="color:#dc2626">*</span>`;
             document.getElementById('easeLabel').innerHTML = `${easeText} <span style="color:#dc2626">*</span>`;
@@ -185,7 +184,6 @@
             document.getElementById('feedbackLabel').textContent = t.feedback_l;
             document.getElementById('submitBtn').textContent = t.submit;
             
-            // Success view translation (Optional)
             if(t.success_title) document.getElementById('successTitle').textContent = t.success_title;
             if(t.success_msg) document.getElementById('successMsg').textContent = t.success_msg;
 
@@ -195,12 +193,19 @@
         async function init() {
             try {
                 const response = await fetch('translations.json');
-                if (!response.ok) throw new Error('Network response was not ok');
                 state.globalData = await response.json();
 
                 const picker = document.getElementById('languagePicker');
-                const regions = ["Europe", "Latin America", "Middle East & Africa", "Asia Pacific"];
                 
+                // Add Placeholder
+                const placeholder = document.createElement('option');
+                placeholder.textContent = "Select your location...";
+                placeholder.value = "";
+                placeholder.disabled = true;
+                placeholder.selected = true; 
+                picker.appendChild(placeholder);
+
+                const regions = ["Europe", "Latin America", "Middle East & Africa", "Asia Pacific"];
                 regions.forEach(region => {
                     const group = document.createElement('optgroup');
                     group.label = region;
@@ -215,17 +220,37 @@
 
                 picker.onchange = (e) => updateUI(e.target.value);
 
+                // LOGIC: URL Params > IP Geo-Detect > Fallback English
+                const params = new URLSearchParams(window.location.search);
+                const urlLang = params.get('lang');
+
+                if (urlLang && state.globalData.languages[urlLang]) {
+                    picker.value = urlLang;
+                    updateUI(urlLang);
+                } else {
+                    try {
+                        const ipResponse = await fetch('https://ipapi.co/json/');
+                        const ipData = await ipResponse.json();
+                        const match = state.globalData.markets.find(m => m.country === ipData.country_name);
+                        
+                        if (match) {
+                            picker.value = match.code;
+                            updateUI(match.code);
+                        } else {
+                            picker.value = 'en';
+                            updateUI('en');
+                        }
+                    } catch (e) {
+                        picker.value = 'en';
+                        updateUI('en');
+                    }
+                }
+
                 setupStarRow('npsStars', 10, true, 'nps', 'npsBadge');
                 setupStarRow('easeStars', 5, false, 'ease', 'easeBadge');
 
-                const params = new URLSearchParams(window.location.search);
-                const urlLang = params.get('lang') || 'en';
-                picker.value = urlLang;
-                updateUI(urlLang);
-
             } catch (err) {
-                console.error("Critical: Could not load translations.json", err);
-                alert("Error loading survey configuration. Please ensure translations.json is available.");
+                console.error("Initialization failed", err);
             }
         }
 
@@ -259,7 +284,7 @@
                     document.getElementById('formView').style.display = 'none';
                     document.getElementById('successView').classList.add('show');
                 } else {
-                    throw new Error('Submit failed');
+                    throw new Error();
                 }
             } catch (err) {
                 alert('Connection Error: Ensure your backend is running.');
