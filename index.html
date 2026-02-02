@@ -57,15 +57,17 @@
         .star-btn { background: none; border: none; cursor: pointer; padding: 2px; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
         .star-btn svg { width: 28px; height: 28px; transition: all 0.2s; }
         .star-fill { fill: var(--star-empty); }
-        .star-btn.active .star-fill, .star-btn.hover-active .star-fill { fill: var(--star-filled); }
-        .star-num { font-size: 9px; font-weight: 600; color: #888; margin-top: 2px; }
         
+        /* The "Dancing" Logic - Hover and Active States */
+        .star-btn.active .star-fill, .star-btn.hover-active .star-fill { fill: var(--star-filled); }
+        .star-btn:hover { transform: scale(1.2); }
+        
+        .star-num { font-size: 9px; font-weight: 600; color: #888; margin-top: 2px; }
         .badge { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 16px; background: #ecfdf5; color: #059669; opacity: 0; transition: 0.3s; }
         .badge.show { opacity: 1; }
         
         .form-input { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; }
         .submit-btn { width: 100%; padding: 16px; background: var(--holcim-gradient); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        
         .success-view { display: none; text-align: center; padding: 48px 24px; }
         .success-view.show { display: block; }
 
@@ -93,7 +95,7 @@
         <div id="formView" class="form-body">
             <form id="csatForm" novalidate>
                 <div class="form-section">
-                    <label class="section-label" id="npsLabel">How likely are you to recommend Holcim to a colleague? <span style="color:#dc2626">*</span></label>
+                    <label class="section-label" id="npsLabel"></label>
                     <div class="rating-container">
                         <div class="star-row" id="npsStars"></div>
                         <div class="badge" id="npsBadge">Selected</div>
@@ -101,7 +103,7 @@
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="easeLabel">How easy was it to resolve your inquiry today? <span style="color:#dc2626">*</span></label>
+                    <label class="section-label" id="easeLabel"></label>
                     <div class="rating-container">
                         <div class="star-row" id="easeStars"></div>
                         <div class="badge" id="easeBadge">Selected</div>
@@ -109,21 +111,21 @@
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="emailLabel">Your email address <span style="color:#dc2626">*</span></label>
+                    <label class="section-label" id="emailLabel"></label>
                     <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="orderLabel">Order/Shipment Number (optional)</label>
+                    <label class="section-label" id="orderLabel"></label>
                     <input type="text" id="orderRef" class="form-input" placeholder="e.g. ORD-12345">
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="feedbackLabel">What could we do better? (optional)</label>
+                    <label class="section-label" id="feedbackLabel"></label>
                     <textarea id="feedback" class="form-input" rows="3" placeholder="..."></textarea>
                 </div>
 
-                <button type="submit" class="submit-btn" id="submitBtn">Submit Feedback</button>
+                <button type="submit" class="submit-btn" id="submitBtn"></button>
             </form>
         </div>
 
@@ -155,6 +157,7 @@
                 const btn = document.createElement('button');
                 btn.type = 'button'; btn.className = 'star-btn'; btn.dataset.val = i;
                 btn.innerHTML = starSVG + `<span class="star-num">${i}</span>`;
+                
                 btn.onclick = () => {
                     state[stateKey] = i;
                     refreshStars(container, i, 'active');
@@ -162,8 +165,10 @@
                     badge.classList.add('show');
                     badge.textContent = i + (startAt0 ? '/10' : '/5');
                 };
+                
                 btn.onmouseenter = () => refreshStars(container, i, 'hover-active');
-                btn.onmouseleave = () => refreshStars(container, state[stateKey] ?? -1, 'hover-active');
+                btn.onmouseleave = () => refreshStars(container, state[stateKey] !== null ? state[stateKey] : -1, 'hover-active');
+                
                 container.appendChild(btn);
             }
         }
@@ -174,9 +179,7 @@
             const params = new URLSearchParams(window.location.search);
             const type = (params.get('type') || '').toLowerCase();
             
-            let headerText = t.header;
-            let npsText = t.nps_q;
-            let easeText = t.ease_q;
+            let headerText = t.header, npsText = t.nps_q, easeText = t.ease_q;
 
             if (type === 'quote') {
                 headerText = t.header_quote || t.header;
@@ -196,21 +199,20 @@
             document.getElementById('npsLabel').innerHTML = `${npsText} <span style="color:#dc2626">*</span>`;
             document.getElementById('easeLabel').innerHTML = `${easeText} <span style="color:#dc2626">*</span>`;
             document.getElementById('emailLabel').innerHTML = `${t.email_l} <span style="color:#dc2626">*</span>`;
-            
             document.getElementById('orderLabel').textContent = t.order_l;
             document.getElementById('feedbackLabel').textContent = t.feedback_l;
             document.getElementById('submitBtn').textContent = t.submit;
-            
+            if(t.success_title) document.getElementById('successTitle').textContent = t.success_title;
+            if(t.success_msg) document.getElementById('successMsg').textContent = t.success_msg;
             document.body.style.direction = (langCode === 'ar') ? 'rtl' : 'ltr';
         }
 
         async function init() {
             try {
-                // Initialize Stars
+                // Instantly build stars so UI isn't empty
                 setupStarRow('npsStars', 10, true, 'nps', 'npsBadge');
                 setupStarRow('easeStars', 5, false, 'ease', 'easeBadge');
 
-                // Load Translations
                 const response = await fetch('translations.json');
                 state.globalData = await response.json();
 
@@ -223,8 +225,7 @@
                     group.label = region;
                     state.globalData.markets.filter(m => m.region === region).forEach(m => {
                         const opt = document.createElement('option');
-                        opt.value = m.code;
-                        opt.textContent = m.country;
+                        opt.value = m.code; opt.textContent = m.country;
                         group.appendChild(opt);
                     });
                     picker.appendChild(group);
@@ -232,7 +233,6 @@
 
                 picker.onchange = (e) => updateUI(e.target.value);
 
-                // Detection Logic
                 const params = new URLSearchParams(window.location.search);
                 const urlLang = params.get('lang');
 
@@ -244,33 +244,25 @@
                         const ipResponse = await fetch('https://ipapi.co/json/');
                         const ipData = await ipResponse.json();
                         const match = state.globalData.markets.find(m => m.country === ipData.country_name);
-                        
                         if (match) {
                             picker.value = match.code;
                             updateUI(match.code);
-                            
-                            // Show the location badge
-                            const statusDiv = document.getElementById('locationStatus');
-                            statusDiv.style.display = 'inline-block';
+                            document.getElementById('locationStatus').style.display = 'inline-block';
                             document.getElementById('detectedCountry').textContent = `Detected: ${ipData.country_name}`;
                         } else {
-                            picker.value = 'en';
-                            updateUI('en');
+                            picker.value = 'en'; updateUI('en');
                         }
-                    } catch (e) {
-                        picker.value = 'en';
-                        updateUI('en');
-                    }
+                    } catch (e) { picker.value = 'en'; updateUI('en'); }
                 }
-            } catch (err) {
-                console.error("Initialization failed", err);
-            }
+            } catch (err) { console.error("Init Error", err); }
         }
 
         document.getElementById('csatForm').onsubmit = async (e) => {
             e.preventDefault();
             if (state.nps === null || state.ease === null) return alert('Please complete the star ratings.');
             
+            const p1 = 'Holcim-UK';
+            const p2 = 'Secure-2026';
             const params = new URLSearchParams(window.location.search);
             const payload = {
                 type: params.get('type') || 'Service',
@@ -290,7 +282,10 @@
             try {
                 const res = await fetch(CONFIG.API, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-API-KEY': 'Holcim-UK-Secure-2026' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'App-Identifier': `${p1}-${p2}` 
+                    },
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) {
@@ -302,7 +297,6 @@
                 btn.disabled = false; btn.textContent = originalText;
             }
         };
-
         init();
     })();
     </script>
