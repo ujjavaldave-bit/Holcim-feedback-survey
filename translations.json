@@ -15,8 +15,12 @@
       "ease_q_invoice": "How easy was it to process this invoice?",
       "email_l": "Your email address",
       "order_l": "Order/Shipment Number (optional)",
+      "quote_l": "Quote Number",
+      "invoice_l": "Invoice Number",
       "feedback_l": "What could we do better? (optional)",
-      "submit": "Submit Feedback"
+      "submit": "Submit Feedback",
+      "success_title": "Thank You!",
+      "success_msg": "Your feedback has been saved successfully."
     },
     "fr": {
       "header": "Commentaires Clients",
@@ -33,8 +37,12 @@
       "ease_q_invoice": "Était-il facile de traiter cette facture ?",
       "email_l": "Votre adresse e-mail",
       "order_l": "Numéro de commande (facultatif)",
+      "quote_l": "Numéro de devis",
+      "invoice_l": "Numéro de facture",
       "feedback_l": "Que pourrions-nous améliorer ? (facultatif)",
-      "submit": "Envoyer"
+      "submit": "Envoyer",
+      "success_title": "Merci !",
+      "success_msg": "Vos commentaires ont été enregistrés avec succès."
     },
     "es": {
       "header": "Comentarios del Cliente",
@@ -51,8 +59,12 @@
       "ease_q_invoice": "¿Qué tan fácil fue procesar esta factura?",
       "email_l": "Su dirección de correo electrónico",
       "order_l": "Número de pedido (opcional)",
+      "quote_l": "Número de cotización",
+      "invoice_l": "Número de factura",
       "feedback_l": "¿Qué podríamos mejorar? (opcional)",
-      "submit": "Enviar"
+      "submit": "Enviar",
+      "success_title": "¡Gracias!",
+      "success_msg": "Sus comentarios han sido guardados exitosamente."
     },
     "de": {
       "header": "Kundenfeedback",
@@ -69,8 +81,12 @@
       "ease_q_invoice": "Wie einfach war die Rechnungsabwicklung?",
       "email_l": "Ihre E-Mail-Adresse",
       "order_l": "Bestellnummer (optional)",
+      "quote_l": "Angebotsnummer",
+      "invoice_l": "Rechnungsnummer",
       "feedback_l": "Was könnten wir besser machen? (optional)",
-      "submit": "Feedback absenden"
+      "submit": "Feedback absenden",
+      "success_title": "Vielen Dank!",
+      "success_msg": "Ihr Feedback wurde erfolgreich gespeichert."
     },
     "it": {
       "header": "Feedback dei Clienti",
@@ -87,8 +103,12 @@
       "ease_q_invoice": "Quanto è stato facile elaborare questa fattura?",
       "email_l": "Il tuo indirizzo email",
       "order_l": "Numero d'ordine (facoltativo)",
+      "quote_l": "Numero di preventivo",
+      "invoice_l": "Numero di fattura",
       "feedback_l": "Cosa potremmo fare meglio? (facoltativo)",
-      "submit": "Invia"
+      "submit": "Invia",
+      "success_title": "Grazie!",
+      "success_msg": "Il tuo feedback è stato salvato con successo."
     },
     "pl": {
       "header": "Opinia Klienta",
@@ -105,8 +125,12 @@
       "ease_q_invoice": "Jak łatwo było przetworzyć tę fakturę?",
       "email_l": "Twój adres e-mail",
       "order_l": "Numer zamówienia (opcjonalnie)",
+      "quote_l": "Numer oferty",
+      "invoice_l": "Numer faktury",
       "feedback_l": "Co moglibyśmy zrobić lepiej? (opcjonalnie)",
-      "submit": "Wyślij"
+      "submit": "Wyślij",
+      "success_title": "Dziękujemy!",
+      "success_msg": "Twoja opinia została pomyślnie zapisana."
     },
     "ro": {
       "header": "Feedback-ul Clienților",
@@ -123,8 +147,12 @@
       "ease_q_invoice": "Cât de ușor a fost procesarea acestei facturi?",
       "email_l": "Adresa ta de e-mail",
       "order_l": "Număr comandă (opțional)",
+      "quote_l": "Număr ofertă",
+      "invoice_l": "Număr factură",
       "feedback_l": "Ce am putea face mai bine? (opțional)",
-      "submit": "Trimiteți"
+      "submit": "Trimiteți",
+      "success_title": "Vă mulțumim!",
+      "success_msg": "Feedback-ul dvs. a fost salvat cu succes."
     },
     "nl": {
       "header": "Klantfeedback",
@@ -141,8 +169,12 @@
       "ease_q_invoice": "Hoe gemakkelijk was de factuurverwerking?",
       "email_l": "Uw e-mailadres",
       "order_l": "Ordernummer (optioneel)",
+      "quote_l": "Offertenummer",
+      "invoice_l": "Factuurnummer",
       "feedback_l": "Wat kunnen we beter doen? (optioneel)",
-      "submit": "Verzenden"
+      "submit": "Verzenden",
+      "success_title": "Bedankt!",
+      "success_msg": "Uw feedback is succesvol opgeslagen."
     },
     "pt": {
       "header": "Feedback do Cliente",
@@ -154,13 +186,17 @@
       "nps_q_delivery": "Com base nesta entrega, qual a probabilidade de recomendar a Holcim?",
       "nps_q_invoice": "Com base nesta fatura, qual a probabilidade de recomendar a Holcim?",
       "ease_q": "Quão fácil foi resolver sua consulta hoje?",
-      "ease_q_quote": "Quão fácil foi obter este orçamento?",
+      "ease_q_quote": "Quão fácil foi obtener este orçamento?",
       "ease_q_delivery": "Quão fácil foi receber esta entrega?",
       "ease_q_invoice": "Quão fácil foi processar esta fatura?",
       "email_l": "Seu endereço de e-mail",
       "order_l": "Número do pedido (opcional)",
+      "quote_l": "Número do orçamento",
+      "invoice_l": "Número da fatura",
       "feedback_l": "O que poderíamos melhorar? (opcional)",
-      "submit": "Enviar"
+      "submit": "Enviar",
+      "success_title": "Obrigado!",
+      "success_msg": "O seu feedback foi guardado com sucesso."
     },
     "ar": {
       "header": "آراء العملاء",
@@ -177,8 +213,12 @@
       "ease_q_invoice": "ما مدى سهولة معالجة هذه الفاتورة؟",
       "email_l": "عنوان بريدك الإلكتروني",
       "order_l": "رقم الطلب (اختياري)",
+      "quote_l": "رقم عرض السعر",
+      "invoice_l": "رقم الفاتورة",
       "feedback_l": "ما الذي يمكننا تحسينه؟ (اختياري)",
-      "submit": "إرسال"
+      "submit": "إرسال",
+      "success_title": "شكراً لك!",
+      "success_msg": "تم حفظ ملاحظاتك بنجاح."
     },
     "bg": {
       "header": "Обратна връзка",
@@ -195,8 +235,12 @@
       "ease_q_invoice": "Колко лесно беше обработването на фактурата?",
       "email_l": "Вашият имейл адрес",
       "order_l": "Номер на поръчка (по избор)",
+      "quote_l": "Номер на оферта",
+      "invoice_l": "Номер на фактура",
       "feedback_l": "Какво можем да подобрим? (по избор)",
-      "submit": "Изпрати"
+      "submit": "Изпрати",
+      "success_title": "Благодарим ви!",
+      "success_msg": "Вашата обратна връзка беше запазена успешно."
     },
     "hr": {
       "header": "Povratne informacije",
@@ -213,8 +257,12 @@
       "ease_q_invoice": "Koliko je bilo lako obraditi ovaj račun?",
       "email_l": "Vaša e-mail adresa",
       "order_l": "Broj narudžbe (neobavezno)",
+      "quote_l": "Broj ponude",
+      "invoice_l": "Broj računa",
       "feedback_l": "Što možemo učiniti bolje? (neobavezno)",
-      "submit": "Pošalji"
+      "submit": "Pošalji",
+      "success_title": "Hvala vam!",
+      "success_msg": "Vaše povratne informacije su uspješno spremljene."
     },
     "cs": {
       "header": "Zpětná vazba",
@@ -231,8 +279,12 @@
       "ease_q_invoice": "Jak snadné bylo zpracovat tuto fakturu?",
       "email_l": "Vaše e-mailová adresa",
       "order_l": "Číslo objednávky (volitelné)",
+      "quote_l": "Číslo nabídky",
+      "invoice_l": "Číslo faktury",
       "feedback_l": "Co bychom mohli zlepšit? (volitelné)",
-      "submit": "Odeslat"
+      "submit": "Odeslat",
+      "success_title": "Děkujeme!",
+      "success_msg": "Vaše zpětná vazba byla úspěšně uložena."
     },
     "hu": {
       "header": "Ügyfélvisszajelzés",
@@ -249,8 +301,12 @@
       "ease_q_invoice": "Mennyire volt egyszerű a számla feldolgozása?",
       "email_l": "Az Ön e-mail címe",
       "order_l": "Rendelésszám (opcionális)",
+      "quote_l": "Ajánlati szám",
+      "invoice_l": "Számlaszám",
       "feedback_l": "Mit tehetnénκ jobban? (opcionális)",
-      "submit": "Küldés"
+      "submit": "Küldés",
+      "success_title": "Köszönjük!",
+      "success_msg": "Visszajelzését sikeresen mentettük."
     },
     "sr": {
       "header": "Povratne informacije",
@@ -267,8 +323,12 @@
       "ease_q_invoice": "Koliko je bilo lako obraditi ovaj račun?",
       "email_l": "Vaša e-mail adresa",
       "order_l": "Broj porudžbine (opciono)",
+      "quote_l": "Broj ponude",
+      "invoice_l": "Broj računa",
       "feedback_l": "Šta možemo bolje? (opciono)",
-      "submit": "Pošalji"
+      "submit": "Pošalji",
+      "success_title": "Hvala!",
+      "success_msg": "Vaše povratne informacije su uspešno sačuvane."
     },
     "sk": {
       "header": "Spätná väzba",
@@ -285,8 +345,12 @@
       "ease_q_invoice": "Aké jednoduché bolo spracovať túto faktúru?",
       "email_l": "Vaša e-mailová adresa",
       "order_l": "Číslo objednávky (voliteľné)",
+      "quote_l": "Číslo ponuky",
+      "invoice_l": "Číslo faktúry",
       "feedback_l": "Čo by sme mogli zlepšiť? (voliteľné)",
-      "submit": "Odoslať"
+      "submit": "Odoslať",
+      "success_title": "Ďakujeme!",
+      "success_msg": "Vaša spätná väzba bola úspešne uložená."
     },
     "el": {
       "header": "Σχόλια Πελατών",
@@ -303,8 +367,12 @@
       "ease_q_invoice": "Πόσο εύκολο ήταν να επεξεργαστείτε αυτό το τιμολόγιο;",
       "email_l": "Η διεύθυνση email σας",
       "order_l": "Αριθμός Παραγγελίας (προαιρετικά)",
+      "quote_l": "Αριθμός Προσφοράς",
+      "invoice_l": "Αριθμός Τιμολογίου",
       "feedback_l": "Τι μπορούμε να κάνουμε καλύτερα; (προαιρετικά)",
-      "submit": "Υποβολή"
+      "submit": "Υποβολή",
+      "success_title": "Ευχαριστούμε!",
+      "success_msg": "Τα σχόλιά σας αποθηκεύτηκαν με επιτυχία."
     },
     "az": {
       "header": "Müştəri Rəyi",
@@ -321,8 +389,12 @@
       "ease_q_invoice": "Fakturanı emal etmək nə qədər asan oldu?",
       "email_l": "E-poçt ünvanınız",
       "order_l": "Sifariş nömrəsi (isteğe bağlı)",
+      "quote_l": "Təklif nömrəsi",
+      "invoice_l": "Faktura nömrəsi",
       "feedback_l": "Nəyi daha yaxşı edə bilərik? (isteğe bağlı)",
-      "submit": "Göndər"
+      "submit": "Göndər",
+      "success_title": "Təşəkkür edirik!",
+      "success_msg": "Rəyiniz uğurla yadda saxlanıldı."
     },
     "bn": {
       "header": "গ্রাহকের মতামত",
@@ -334,13 +406,17 @@
       "nps_q_delivery": "এই সরবরাহের ভিত্তিতে, আপনি কি হোলসিম সুপারিশ করবেন?",
       "nps_q_invoice": "এই চালানের ভিত্তিতে, আপনি কি হোলসিম সুপারিশ করবেন?",
       "ease_q": "আপনার সমস্যাটি সমাধান করা কতটা সহজ ছিল?",
-      "ease_q_quote": "এই উদ্ধৃতিটি পাওয়া কতটা সহজ ছিল?",
+      "ease_q_quote": "এই উদ্ধৃতিটি পাওয়া কতটা সহজ ছিল?",
       "ease_q_delivery": "এই সরবরাহটি গ্রহণ করা কতটা সহজ ছিল?",
       "ease_q_invoice": "এই চালানটি প্রসেস করা কতটা সহজ ছিল?",
       "email_l": "আপনার ইমেল ঠিকানা",
       "order_l": "অর্ডার নম্বর (ঐচ্ছিক)",
+      "quote_l": "উদ্ধৃতি নম্বর",
+      "invoice_l": "চালান নম্বর",
       "feedback_l": "আমরা আরও কী ভালো করতে পারি? (ঐচ্ছিক)",
-      "submit": "জমা দিন"
+      "submit": "জমা দিন",
+      "success_title": "ধন্যবাদ!",
+      "success_msg": "আপনার মতামত সফলভাবে সংরক্ষণ করা হয়েছে।"
     }
   },
   "markets": [
