@@ -132,7 +132,7 @@
 
         function setupStarRow(containerId, count, startAt0, stateKey, badgeId) {
             const container = document.getElementById(containerId);
-            container.innerHTML = ''; // Clear for language switching if needed
+            container.innerHTML = '';
             for (let i = (startAt0 ? 0 : 1); i <= count; i++) {
                 const btn = document.createElement('button');
                 btn.type = 'button'; btn.className = 'star-btn'; btn.dataset.val = i;
@@ -152,9 +152,17 @@
         function updateUI(langCode) {
             const t = state.globalData.languages[langCode] || state.globalData.languages['en'];
             
+            // Header and Star Labels
             document.querySelector('.header-title').textContent = t.header;
             document.getElementById('npsLabel').firstChild.textContent = t.nps_q + " ";
             document.getElementById('easeLabel').firstChild.textContent = t.ease_q + " ";
+            
+            // Localized Form Fields
+            document.getElementById('emailLabel').firstChild.textContent = t.email_l + " ";
+            document.getElementById('orderLabel').textContent = t.order_l;
+            document.getElementById('feedbackLabel').textContent = t.feedback_l;
+            
+            // Button and Success View
             document.getElementById('submitBtn').textContent = t.submit;
             
             // Handle RTL for Arabic
@@ -163,11 +171,9 @@
 
         async function init() {
             try {
-                // 1. Fetch JSON file
                 const response = await fetch('translations.json');
                 state.globalData = await response.json();
 
-                // 2. Populate Dropdown
                 const picker = document.getElementById('languagePicker');
                 const regions = ["Europe", "Latin America", "Middle East & Africa", "Asia Pacific"];
                 
@@ -185,11 +191,9 @@
 
                 picker.onchange = (e) => updateUI(e.target.value);
 
-                // 3. Initial View Setup
                 setupStarRow('npsStars', 10, true, 'nps', 'npsBadge');
                 setupStarRow('easeStars', 5, false, 'ease', 'easeBadge');
 
-                // 4. Handle URL Params (Language & OPCO auto-detect)
                 const params = new URLSearchParams(window.location.search);
                 const urlLang = params.get('lang') || 'en';
                 picker.value = urlLang;
