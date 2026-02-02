@@ -1,274 +1,386 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Customer Feedback | Holcim Group</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --holcim-blue: #1d4370;
-            --holcim-gradient: linear-gradient(135deg, #1d4370 0%, #04bbf1 50%, #94c12e 100%);
-            --surface: #ffffff;
-            --background: #f4f6f8;
-            --text-primary: #1a1a2e;
-            --border: #e2e6eb;
-            --star-empty: #d1d5db;
-            --star-filled: #fbbf24;
-            --radius-lg: 20px;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--background); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; transition: direction 0.3s; }
-        
-        .card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 20px 50px rgba(29, 67, 112, 0.12); overflow: hidden; width: 100%; max-width: 520px; animation: slideUp 0.4s ease-out; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .header { background: var(--holcim-gradient); padding: 28px; text-align: center; color: white; position: relative; }
-        .holcim-logo { height: 50px; filter: brightness(0) invert(1); margin-bottom: 10px; }
-        
-        .lang-nav { margin-bottom: 12px; display: flex; justify-content: center; }
-        #languagePicker { 
-            background: rgba(255, 255, 255, 0.2); 
-            color: white; 
-            border: 1px solid rgba(255, 255, 255, 0.3); 
-            padding: 4px 12px; 
-            border-radius: 20px; 
-            font-size: 12px; 
-            cursor: pointer;
-            outline: none;
-        }
-        #languagePicker option { color: black; }
-
-        .form-body { padding: 24px; }
-        .form-section { margin-bottom: 24px; }
-        .section-label { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: block; }
-        .rating-container { background: #f0f2f5; border-radius: 12px; padding: 16px; text-align: center; }
-        .star-row { display: flex; justify-content: center; gap: 4px; }
-        .star-btn { background: none; border: none; cursor: pointer; padding: 2px; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-        .star-btn svg { width: 28px; height: 28px; transition: all 0.2s; }
-        .star-fill { fill: var(--star-empty); }
-        .star-btn.active .star-fill, .star-btn.hover-active .star-fill { fill: var(--star-filled); }
-        .star-num { font-size: 9px; font-weight: 600; color: #888; margin-top: 2px; }
-        
-        .badge { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 16px; background: #ecfdf5; color: #059669; opacity: 0; transition: 0.3s; }
-        .badge.show { opacity: 1; }
-        
-        .form-input { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; }
-        .submit-btn { width: 100%; padding: 16px; background: var(--holcim-gradient); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        
-        .success-view { display: none; text-align: center; padding: 48px 24px; }
-        .success-view.show { display: block; }
-
-        @media (max-width: 480px) {
-            .star-row { gap: 1px; justify-content: space-between; }
-            #npsStars .star-btn svg { width: 22px; height: 22px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <header class="header">
-            <div class="lang-nav">
-                <select id="languagePicker"></select>
-            </div>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Holcim_Logo_2021_sRGB.png" alt="Holcim" class="holcim-logo">
-            <p class="header-title">Customer Feedback</p>
-        </header>
-
-        <div id="formView" class="form-body">
-            <form id="csatForm" novalidate>
-                <div class="form-section">
-                    <label class="section-label" id="npsLabel"></label>
-                    <div class="rating-container">
-                        <div class="star-row" id="npsStars"></div>
-                        <div class="badge" id="npsBadge">Selected</div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <label class="section-label" id="easeLabel"></label>
-                    <div class="rating-container">
-                        <div class="star-row" id="easeStars"></div>
-                        <div class="badge" id="easeBadge">Selected</div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <label class="section-label" id="emailLabel"></label>
-                    <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
-                </div>
-
-                <div class="form-section">
-                    <label class="section-label" id="orderLabel"></label>
-                    <input type="text" id="orderRef" class="form-input" placeholder="e.g. ORD-12345">
-                </div>
-
-                <div class="form-section">
-                    <label class="section-label" id="feedbackLabel"></label>
-                    <textarea id="feedback" class="form-input" rows="3" placeholder="..."></textarea>
-                </div>
-
-                <button type="submit" class="submit-btn" id="submitBtn"></button>
-            </form>
-        </div>
-
-        <div id="successView" class="success-view">
-            <h2 id="successTitle">Thank You!</h2>
-            <p id="successMsg">Your feedback has been saved successfully.</p>
-        </div>
-    </div>
-
-    <script>
-    (function() {
-        'use strict';
-        const CONFIG = { API: 'https://mesne-unpreclusively-dana.ngrok-free.dev/submit' };
-        const state = { nps: null, ease: null, globalData: null };
-        const starSVG = '<svg viewBox="0 0 24 24"><path class="star-fill" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
-
-        function refreshStars(container, val, className) {
-            Array.from(container.children).forEach(btn => {
-                const isLit = parseInt(btn.dataset.val) <= val;
-                btn.classList.toggle(className, isLit);
-            });
-        }
-
-        function setupStarRow(containerId, count, startAt0, stateKey, badgeId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            for (let i = (startAt0 ? 0 : 1); i <= count; i++) {
-                const btn = document.createElement('button');
-                btn.type = 'button'; btn.className = 'star-btn'; btn.dataset.val = i;
-                btn.innerHTML = starSVG + `<span class="star-num">${i}</span>`;
-                btn.onclick = () => {
-                    state[stateKey] = i;
-                    refreshStars(container, i, 'active');
-                    document.getElementById(badgeId).classList.add('show');
-                    document.getElementById(badgeId).textContent = i + (startAt0 ? '/10' : '/5');
-                };
-                btn.onmouseenter = () => refreshStars(container, i, 'hover-active');
-                btn.onmouseleave = () => refreshStars(container, state[stateKey] ?? -1, 'hover-active');
-                container.appendChild(btn);
-            }
-        }
-
-        function updateUI(langCode) {
-            const t = state.globalData.languages[langCode] || state.globalData.languages['en'];
-            const params = new URLSearchParams(window.location.search);
-            const type = (params.get('type') || '').toLowerCase();
-            
-            let headerText = t.header;
-            let npsText = t.nps_q;
-            let easeText = t.ease_q;
-
-            // Context-Aware Logic
-            if (type === 'quote') {
-                headerText = t.header_quote || t.header;
-                npsText = t.nps_q_quote || t.nps_q;
-                easeText = t.ease_q_quote || t.ease_q;
-            } else if (type === 'delivery') {
-                headerText = t.header_delivery || t.header;
-                npsText = t.nps_q_delivery || t.nps_q;
-                easeText = t.ease_q_delivery || t.ease_q;
-            } else if (type === 'invoice') {
-                headerText = t.header_invoice || t.header;
-                npsText = t.nps_q_invoice || t.nps_q;
-                easeText = t.ease_q_invoice || t.ease_q;
-            }
-
-            // Apply translations and keep Red Asterisk for required fields
-            document.querySelector('.header-title').textContent = headerText;
-            document.getElementById('npsLabel').innerHTML = `${npsText} <span style="color:#dc2626">*</span>`;
-            document.getElementById('easeLabel').innerHTML = `${easeText} <span style="color:#dc2626">*</span>`;
-            document.getElementById('emailLabel').innerHTML = `${t.email_l} <span style="color:#dc2626">*</span>`;
-            
-            document.getElementById('orderLabel').textContent = t.order_l;
-            document.getElementById('feedbackLabel').textContent = t.feedback_l;
-            document.getElementById('submitBtn').textContent = t.submit;
-            
-            // Success view translation (Optional)
-            if(t.success_title) document.getElementById('successTitle').textContent = t.success_title;
-            if(t.success_msg) document.getElementById('successMsg').textContent = t.success_msg;
-
-            document.body.style.direction = (langCode === 'ar') ? 'rtl' : 'ltr';
-        }
-
-        async function init() {
-            try {
-                const response = await fetch('translations.json');
-                if (!response.ok) throw new Error('Network response was not ok');
-                state.globalData = await response.json();
-
-                const picker = document.getElementById('languagePicker');
-                const regions = ["Europe", "Latin America", "Middle East & Africa", "Asia Pacific"];
-                
-                regions.forEach(region => {
-                    const group = document.createElement('optgroup');
-                    group.label = region;
-                    state.globalData.markets.filter(m => m.region === region).forEach(m => {
-                        const opt = document.createElement('option');
-                        opt.value = m.code;
-                        opt.textContent = m.country;
-                        group.appendChild(opt);
-                    });
-                    picker.appendChild(group);
-                });
-
-                picker.onchange = (e) => updateUI(e.target.value);
-
-                setupStarRow('npsStars', 10, true, 'nps', 'npsBadge');
-                setupStarRow('easeStars', 5, false, 'ease', 'easeBadge');
-
-                const params = new URLSearchParams(window.location.search);
-                const urlLang = params.get('lang') || 'en';
-                picker.value = urlLang;
-                updateUI(urlLang);
-
-            } catch (err) {
-                console.error("Critical: Could not load translations.json", err);
-                alert("Error loading survey configuration. Please ensure translations.json is available.");
-            }
-        }
-
-        document.getElementById('csatForm').onsubmit = async (e) => {
-            e.preventDefault();
-            if (state.nps === null || state.ease === null) return alert('Please complete the star ratings.');
-            
-            const params = new URLSearchParams(window.location.search);
-            const payload = {
-                type: params.get('type') || 'Service',
-                lob: params.get('lob') || 'Standard',
-                opco: params.get('opco') || 'Holcim Group',
-                email: document.getElementById('email').value,
-                orderRef: document.getElementById('orderRef').value,
-                nps: state.nps,
-                ease: state.ease,
-                feedback: document.getElementById('feedback').value
-            };
-
-            const btn = document.getElementById('submitBtn');
-            const originalText = btn.textContent;
-            btn.disabled = true; btn.textContent = '...';
-
-            try {
-                const res = await fetch(CONFIG.API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-API-KEY': 'Holcim-UK-Secure-2026' },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    document.getElementById('formView').style.display = 'none';
-                    document.getElementById('successView').classList.add('show');
-                } else {
-                    throw new Error('Submit failed');
-                }
-            } catch (err) {
-                alert('Connection Error: Ensure your backend is running.');
-                btn.disabled = false; btn.textContent = originalText;
-            }
-        };
-
-        init();
-    })();
-    </script>
-</body>
-</html>
+{
+  "languages": {
+    "en": {
+      "header": "Customer Feedback",
+      "header_quote": "Quote Feedback",
+      "header_delivery": "Delivery Feedback",
+      "header_invoice": "Invoice Feedback",
+      "nps_q": "How likely are you to recommend Holcim to a colleague?",
+      "nps_q_quote": "Based on this quote experience, how likely are you to recommend Holcim to a colleague?",
+      "nps_q_delivery": "Based on this delivery, how likely are you to recommend Holcim to a colleague?",
+      "nps_q_invoice": "Based on your invoicing experience, how likely are you to recommend Holcim to a colleague?",
+      "ease_q": "How easy was it to resolve your inquiry today?",
+      "ease_q_quote": "How easy was it to get this quote?",
+      "ease_q_delivery": "How easy was it to receive this delivery?",
+      "ease_q_invoice": "How easy was it to process this invoice?",
+      "email_l": "Your email address",
+      "order_l": "Order/Shipment Number (optional)",
+      "feedback_l": "What could we do better? (optional)",
+      "submit": "Submit Feedback"
+    },
+    "fr": {
+      "header": "Commentaires Clients",
+      "header_quote": "Commentaires sur le Devis",
+      "header_delivery": "Commentaires sur la Livraison",
+      "header_invoice": "Commentaires sur la Facturation",
+      "nps_q": "Quelle est la probabilité que vous recommandiez Holcim à un collègue ?",
+      "nps_q_quote": "Sur la base de ce devis, quelle est la probabilité que vous recommandiez Holcim à un collègue ?",
+      "nps_q_delivery": "Sur la base de cette livraison, quelle est la probabilité que vous recommandiez Holcim à un collègue ?",
+      "nps_q_invoice": "Sur la base de cette facturation, quelle est la probabilité que vous recommandiez Holcim à un collègue ?",
+      "ease_q": "Était-il facile de résoudre votre demande aujourd'hui ?",
+      "ease_q_quote": "Était-il facile d'obtenir ce devis ?",
+      "ease_q_delivery": "Était-il facile de recevoir cette livraison ?",
+      "ease_q_invoice": "Était-il facile de traiter cette facture ?",
+      "email_l": "Votre adresse e-mail",
+      "order_l": "Numéro de commande (facultatif)",
+      "feedback_l": "Que pourrions-nous améliorer ? (facultatif)",
+      "submit": "Envoyer"
+    },
+    "es": {
+      "header": "Comentarios del Cliente",
+      "header_quote": "Comentarios sobre la Cotización",
+      "header_delivery": "Comentarios sobre la Entrega",
+      "header_invoice": "Comentarios sobre la Factura",
+      "nps_q": "¿Qué tan probable es que recomiende Holcim a un colega?",
+      "nps_q_quote": "Basado en esta cotización, ¿qué tan probable es que recomiende Holcim a un colega?",
+      "nps_q_delivery": "Basado en esta entrega, ¿qué tan probable es que recomiende Holcim a un colega?",
+      "nps_q_invoice": "Basado en su experiencia de facturación, ¿qué tan probable es que recomiende Holcim a un colega?",
+      "ease_q": "¿Qué tan fácil fue resolver su consulta hoy?",
+      "ease_q_quote": "¿Qué tan fácil fue obtener esta cotización?",
+      "ease_q_delivery": "¿Qué tan fácil fue recibir esta entrega?",
+      "ease_q_invoice": "¿Qué tan fácil fue procesar esta factura?",
+      "email_l": "Su dirección de correo electrónico",
+      "order_l": "Número de pedido (opcional)",
+      "feedback_l": "¿Qué podríamos mejorar? (opcional)",
+      "submit": "Enviar"
+    },
+    "de": {
+      "header": "Kundenfeedback",
+      "header_quote": "Feedback zum Angebot",
+      "header_delivery": "Feedback zur Lieferung",
+      "header_invoice": "Feedback zur Rechnung",
+      "nps_q": "Wie wahrscheinlich ist es, dass Sie Holcim weiterempfehlen?",
+      "nps_q_quote": "Wie wahrscheinlich ist es nach diesem Angebot, dass Sie Holcim weiterempfehlen?",
+      "nps_q_delivery": "Wie wahrscheinlich ist es nach dieser Lieferung, dass Sie Holcim weiterempfehlen?",
+      "nps_q_invoice": "Wie wahrscheinlich ist es nach dieser Rechnungsstellung, dass Sie Holcim weiterempfehlen?",
+      "ease_q": "Wie einfach war es, Ihre Anfrage heute zu lösen?",
+      "ease_q_quote": "Wie einfach war es, dieses Angebot zu erhalten?",
+      "ease_q_delivery": "Wie einfach war es, diese Lieferung zu erhalten?",
+      "ease_q_invoice": "Wie einfach war die Rechnungsabwicklung?",
+      "email_l": "Ihre E-Mail-Adresse",
+      "order_l": "Bestellnummer (optional)",
+      "feedback_l": "Was könnten wir besser machen? (optional)",
+      "submit": "Feedback absenden"
+    },
+    "it": {
+      "header": "Feedback dei Clienti",
+      "header_quote": "Feedback sul Preventivo",
+      "header_delivery": "Feedback sulla Consegna",
+      "header_invoice": "Feedback sulla Fattura",
+      "nps_q": "Quanto è probabile che consiglieresti Holcim a un collega?",
+      "nps_q_quote": "In base a questo preventivo, quanto è probabile che consiglieresti Holcim?",
+      "nps_q_delivery": "In base a questa consegna, quanto è probabile che consiglieresti Holcim?",
+      "nps_q_invoice": "In base a questa fattura, quanto è probabile che consiglieresti Holcim?",
+      "ease_q": "Quanto è stato facile risolvere la tua richiesta oggi?",
+      "ease_q_quote": "Quanto è stato facile ottenere questo preventivo?",
+      "ease_q_delivery": "Quanto è stato facile ricevere questa consegna?",
+      "ease_q_invoice": "Quanto è stato facile elaborare questa fattura?",
+      "email_l": "Il tuo indirizzo email",
+      "order_l": "Numero d'ordine (facoltativo)",
+      "feedback_l": "Cosa potremmo fare meglio? (facoltativo)",
+      "submit": "Invia"
+    },
+    "pl": {
+      "header": "Opinia Klienta",
+      "header_quote": "Opinia o Ofercie",
+      "header_delivery": "Opinia o Dostawie",
+      "header_invoice": "Opinia o Fakturze",
+      "nps_q": "Jak bardzo prawdopodobne jest, że polecisz Holcim koledze?",
+      "nps_q_quote": "Na podstawie tej oferty, jak bardzo prawdopodobne jest, że polecisz Holcim?",
+      "nps_q_delivery": "Na podstawie tej dostawy, jak bardzo prawdopodobne jest, że polecisz Holcim?",
+      "nps_q_invoice": "Na podstawie tej faktury, jak bardzo prawdopodobne jest, że polecisz Holcim?",
+      "ease_q": "Jak łatwo było dzisiaj rozwiązać Twoje zapytanie?",
+      "ease_q_quote": "Jak łatwo było uzyskać tę ofertę?",
+      "ease_q_delivery": "Jak łatwo było odebrać tę dostawę?",
+      "ease_q_invoice": "Jak łatwo było przetworzyć tę fakturę?",
+      "email_l": "Twój adres e-mail",
+      "order_l": "Numer zamówienia (opcjonalnie)",
+      "feedback_l": "Co moglibyśmy zrobić lepiej? (opcjonalnie)",
+      "submit": "Wyślij"
+    },
+    "ro": {
+      "header": "Feedback-ul Clienților",
+      "header_quote": "Feedback Ofertă",
+      "header_delivery": "Feedback Livrare",
+      "header_invoice": "Feedback Factură",
+      "nps_q": "Cât de probabil este să recomandați Holcim unui coleg?",
+      "nps_q_quote": "Pe baza acestei oferte, cât de probabil este să recomandați Holcim?",
+      "nps_q_delivery": "Pe baza acestei livrări, cât de probabil este să recomandați Holcim?",
+      "nps_q_invoice": "Pe baza acestei facturi, cât de probabil este să recomandați Holcim?",
+      "ease_q": "Cât de ușor a fost să vă rezolvați solicitarea astăzi?",
+      "ease_q_quote": "Cât de ușor a fost să obțineți această ofertă?",
+      "ease_q_delivery": "Cât de ușor a fost să primiți această livrare?",
+      "ease_q_invoice": "Cât de ușor a fost procesarea acestei facturi?",
+      "email_l": "Adresa ta de e-mail",
+      "order_l": "Număr comandă (opțional)",
+      "feedback_l": "Ce am putea face mai bine? (opțional)",
+      "submit": "Trimiteți"
+    },
+    "nl": {
+      "header": "Klantfeedback",
+      "header_quote": "Feedback Offerte",
+      "header_delivery": "Feedback Levering",
+      "header_invoice": "Feedback Factuur",
+      "nps_q": "Hoe waarschijnlijk is het dat u Holcim zou aanbevelen?",
+      "nps_q_quote": "Op basis van deze offerte, hoe waarschijnlijk is het dat u Holcim aanbeveelt?",
+      "nps_q_delivery": "Op basis van deze levering, hoe waarschijnlijk is het dat u Holcim aanbeveelt?",
+      "nps_q_invoice": "Op basis van deze factuur, hoe waarschijnlijk is het dat u Holcim aanbeveelt?",
+      "ease_q": "Hoe gemakkelijk was het om uw vraag vandaag op te lossen?",
+      "ease_q_quote": "Hoe gemakkelijk was het om deze offerte te krijgen?",
+      "ease_q_delivery": "Hoe gemakkelijk was het om deze levering te ontvangen?",
+      "ease_q_invoice": "Hoe gemakkelijk was de factuurverwerking?",
+      "email_l": "Uw e-mailadres",
+      "order_l": "Ordernummer (optioneel)",
+      "feedback_l": "Wat kunnen we beter doen? (optioneel)",
+      "submit": "Verzenden"
+    },
+    "pt": {
+      "header": "Feedback do Cliente",
+      "header_quote": "Feedback do Orçamento",
+      "header_delivery": "Feedback da Entrega",
+      "header_invoice": "Feedback da Fatura",
+      "nps_q": "Qual a probabilidade de recomendar a Holcim a um colega?",
+      "nps_q_quote": "Com base neste orçamento, qual a probabilidade de recomendar a Holcim?",
+      "nps_q_delivery": "Com base nesta entrega, qual a probabilidade de recomendar a Holcim?",
+      "nps_q_invoice": "Com base nesta fatura, qual a probabilidade de recomendar a Holcim?",
+      "ease_q": "Quão fácil foi resolver sua consulta hoje?",
+      "ease_q_quote": "Quão fácil foi obter este orçamento?",
+      "ease_q_delivery": "Quão fácil foi receber esta entrega?",
+      "ease_q_invoice": "Quão fácil foi processar esta fatura?",
+      "email_l": "Seu endereço de e-mail",
+      "order_l": "Número do pedido (opcional)",
+      "feedback_l": "O que poderíamos melhorar? (opcional)",
+      "submit": "Enviar"
+    },
+    "ar": {
+      "header": "آراء العملاء",
+      "header_quote": "آراء حول عرض السعر",
+      "header_delivery": "آراء حول التوصيل",
+      "header_invoice": "آراء حول الفاتورة",
+      "nps_q": "ما مدى احتمالية ترشيحك لهولسيم لزميل؟",
+      "nps_q_quote": "بناءً على تجربة عرض السعر هذا، ما مدى احتمالية ترشيحك لهولسيم؟",
+      "nps_q_delivery": "بناءً على تجربة التوصيل هذه، ما مدى احتمالية ترشيحك لهولسيم؟",
+      "nps_q_invoice": "بناءً على تجربة الفاتورة هذه، ما مدى احتمالية ترشيحك لهولسيم؟",
+      "ease_q": "ما مدى سهولة حل استفسارك اليوم؟",
+      "ease_q_quote": "ما مدى سهولة الحصول على عرض السعر هذا؟",
+      "ease_q_delivery": "ما مدى سهولة استلام هذه الشحنة؟",
+      "ease_q_invoice": "ما مدى سهولة معالجة هذه الفاتورة؟",
+      "email_l": "عنوان بريدك الإلكتروني",
+      "order_l": "رقم الطلب (اختياري)",
+      "feedback_l": "ما الذي يمكننا تحسينه؟ (اختياري)",
+      "submit": "إرسال"
+    },
+    "bg": {
+      "header": "Обратна връзка",
+      "header_quote": "Обратна връзка за оферта",
+      "header_delivery": "Обратна връзка за доставка",
+      "header_invoice": "Обратна връзка за фактура",
+      "nps_q": "Колко вероятно е да препоръчате Holcim на колега?",
+      "nps_q_quote": "Въз основа на тази оферта, колко вероятно е да препоръчате Holcim?",
+      "nps_q_delivery": "Въз основа на тази доставка, колко вероятно е да препоръчате Holcim?",
+      "nps_q_invoice": "Въз основа на тази фактура, колко вероятно е да препоръчате Holcim?",
+      "ease_q": "Колко лесно беше да разрешите запитването си днес?",
+      "ease_q_quote": "Колко лесно беше да получите тази оферта?",
+      "ease_q_delivery": "Колко лесно беше да получите тази доставка?",
+      "ease_q_invoice": "Колко лесно беше обработването на фактурата?",
+      "email_l": "Вашият имейл адрес",
+      "order_l": "Номер на поръчка (по избор)",
+      "feedback_l": "Какво можем да подобрим? (по избор)",
+      "submit": "Изпрати"
+    },
+    "hr": {
+      "header": "Povratne informacije",
+      "header_quote": "Povratne informacije o ponudi",
+      "header_delivery": "Povratne informacije o dostavi",
+      "header_invoice": "Povratne informacije o računu",
+      "nps_q": "Koliko je vjerojatno da biste preporučili Holcim kolegi?",
+      "nps_q_quote": "Na temelju ove ponude, koliko je vjerojatno da biste preporučili Holcim?",
+      "nps_q_delivery": "Na temelju ove dostave, koliko je vjerojatno da biste preporučili Holcim?",
+      "nps_q_invoice": "Na temelju ovog računa, koliko je vjerojatno da biste preporučili Holcim?",
+      "ease_q": "Koliko je danas bilo lako riješiti vaš upit?",
+      "ease_q_quote": "Koliko je bilo lako dobiti ovu ponudu?",
+      "ease_q_delivery": "Koliko je bilo lako primiti ovu dostavu?",
+      "ease_q_invoice": "Koliko je bilo lako obraditi ovaj račun?",
+      "email_l": "Vaša e-mail adresa",
+      "order_l": "Broj narudžbe (neobavezno)",
+      "feedback_l": "Što možemo učiniti bolje? (neobavezno)",
+      "submit": "Pošalji"
+    },
+    "cs": {
+      "header": "Zpětná vazba",
+      "header_quote": "Zpětná vazba na nabídku",
+      "header_delivery": "Zpětná vazba na dodávku",
+      "header_invoice": "Zpětná vazba na fakturu",
+      "nps_q": "Jak pravděpodobné je, že byste doporučili Holcim kolegovi?",
+      "nps_q_quote": "Na základě této nabídky, jak pravděpodobné je, že doporučíte Holcim?",
+      "nps_q_delivery": "Na základě této dodávky, jak pravděpodobné je, že doporučíte Holcim?",
+      "nps_q_invoice": "Na základě této faktury, jak pravděpodobné je, že doporučíte Holcim?",
+      "ease_q": "Jak snadné bylo dnes vyřešit váš dotaz?",
+      "ease_q_quote": "Jak snadné bylo získat tuto nabídku?",
+      "ease_q_delivery": "Jak snadné bylo přijmout tuto dodávku?",
+      "ease_q_invoice": "Jak snadné bylo zpracovat tuto fakturu?",
+      "email_l": "Vaše e-mailová adresa",
+      "order_l": "Číslo objednávky (volitelné)",
+      "feedback_l": "Co bychom mohli zlepšit? (volitelné)",
+      "submit": "Odeslat"
+    },
+    "hu": {
+      "header": "Ügyfélvisszajelzés",
+      "header_quote": "Ajánlati visszajelzés",
+      "header_delivery": "Szállítási visszajelzés",
+      "header_invoice": "Számlázási visszajelzés",
+      "nps_q": "Mennyire valószínű, hogy ajánlaná a Holcim-ot?",
+      "nps_q_quote": "Ezen ajánlat alapján mennyire valószínű, hogy ajánlaná a Holcim-ot?",
+      "nps_q_delivery": "Ezen szállítás alapján mennyire valószínű, hogy ajánlaná a Holcim-ot?",
+      "nps_q_invoice": "Ezen számlázás alapján mennyire valószínű, hogy ajánlaná a Holcim-ot?",
+      "ease_q": "Mennyire volt egyszerű ma megoldani a kérését?",
+      "ease_q_quote": "Mennyire volt egyszerű megkapni ezt az ajánlatot?",
+      "ease_q_delivery": "Mennyire volt egyszerű átvenni ezt a szállítmányt?",
+      "ease_q_invoice": "Mennyire volt egyszerű a számla feldolgozása?",
+      "email_l": "Az Ön e-mail címe",
+      "order_l": "Rendelésszám (opcionális)",
+      "feedback_l": "Mit tehetnénκ jobban? (opcionális)",
+      "submit": "Küldés"
+    },
+    "sr": {
+      "header": "Povratne informacije",
+      "header_quote": "Povratne informacije o ponudi",
+      "header_delivery": "Povratne informacije o dostavi",
+      "header_invoice": "Povratne informacije o računu",
+      "nps_q": "Koliko je verovatno da biste preporučili Holcim kolegi?",
+      "nps_q_quote": "Na osnovu ove ponude, koliko je verovatno da biste preporučili Holcim?",
+      "nps_q_delivery": "Na osnovu ove dostave, koliko je verovatno da biste preporučili Holcim?",
+      "nps_q_invoice": "Na osnovu ovog računa, koliko je verovatno da biste preporučili Holcim?",
+      "ease_q": "Koliko je lako bilo rešiti vaš upit danas?",
+      "ease_q_quote": "Koliko je bilo lako dobiti ovu ponudu?",
+      "ease_q_delivery": "Koliko je bilo lako primiti ovu dostavu?",
+      "ease_q_invoice": "Koliko je bilo lako obraditi ovaj račun?",
+      "email_l": "Vaša e-mail adresa",
+      "order_l": "Broj porudžbine (opciono)",
+      "feedback_l": "Šta možemo bolje? (opciono)",
+      "submit": "Pošalji"
+    },
+    "sk": {
+      "header": "Spätná väzba",
+      "header_quote": "Spätná väzba na ponuku",
+      "header_delivery": "Spätná väzba na dodávku",
+      "header_invoice": "Spätná väzba na faktúru",
+      "nps_q": "Aká je pravdepodobnosť, že by ste odporučili Holcim?",
+      "nps_q_quote": "Na základe tejto ponuky, aká je pravdepodobnosť, že odporučíte Holcim?",
+      "nps_q_delivery": "Na základe tejto dodávky, aká je pravdepodobnosť, že odporučíte Holcim?",
+      "nps_q_invoice": "Na základe tejto faktúry, aká je pravdepodobnosť, že odporučíte Holcim?",
+      "ease_q": "Aké jednoduché bolo dnes vyriešiť vašu požiadavku?",
+      "ease_q_quote": "Aké jednoduché bolo získať túto ponuku?",
+      "ease_q_delivery": "Aké jednoduché bolo prijať túto dodávku?",
+      "ease_q_invoice": "Aké jednoduché bolo spracovať túto faktúru?",
+      "email_l": "Vaša e-mailová adresa",
+      "order_l": "Číslo objednávky (voliteľné)",
+      "feedback_l": "Čo by sme mogli zlepšiť? (voliteľné)",
+      "submit": "Odoslať"
+    },
+    "el": {
+      "header": "Σχόλια Πελατών",
+      "header_quote": "Σχόλια για την Προσφορά",
+      "header_delivery": "Σχόλια για την Παράδοση",
+      "header_invoice": "Σχόλια για το Τιμολόγιο",
+      "nps_q": "Πόσο πιθανό είναι να προτείνετε τη Holcim;",
+      "nps_q_quote": "Με βάση αυτή την προσφορά, πόσο πιθανό είναι να προτείνετε τη Holcim;",
+      "nps_q_delivery": "Με βάση αυτή την παράδοση, πόσο πιθανό είναι να προτείνετε τη Holcim;",
+      "nps_q_invoice": "Με βάση αυτό το τιμολόγιο, πόσο πιθανό είναι να προτείνετε τη Holcim;",
+      "ease_q": "Πόσο εύκολο ήταν να επιλυθεί το αίτημά σας σήμερα;",
+      "ease_q_quote": "Πόσο εύκολο ήταν να λάβετε αυτή την προσφορά;",
+      "ease_q_delivery": "Πόσο εύκολο ήταν να παραλάβετε αυτή την παράδοση;",
+      "ease_q_invoice": "Πόσο εύκολο ήταν να επεξεργαστείτε αυτό το τιμολόγιο;",
+      "email_l": "Η διεύθυνση email σας",
+      "order_l": "Αριθμός Παραγγελίας (προαιρετικά)",
+      "feedback_l": "Τι μπορούμε να κάνουμε καλύτερα; (προαιρετικά)",
+      "submit": "Υποβολή"
+    },
+    "az": {
+      "header": "Müştəri Rəyi",
+      "header_quote": "Təklif haqqında rəy",
+      "header_delivery": "Çatdırılma haqqında rəy",
+      "header_invoice": "Faktura haqqında rəy",
+      "nps_q": "Holcim-i tövsiyə etmə ehtimalınız nə qədərdir?",
+      "nps_q_quote": "Bu təklifə əsasən, Holcim-i tövsiyə etmə ehtimalınız nə qədərdir?",
+      "nps_q_delivery": "Bu çatdırılmaya əsasən, Holcim-i tövsiyə etmə ehtimalınız nə qədərdir?",
+      "nps_q_invoice": "Bu fakturaya əsasən, Holcim-i tövsiyə etmə ehtimalınız nə qədərdir?",
+      "ease_q": "Sorğunuzu həll etmək nə qədər asan oldu?",
+      "ease_q_quote": "Bu təklifi almaq nə qədər asan oldu?",
+      "ease_q_delivery": "Bu çatdırılmanı qəbul etmək nə qədər asan oldu?",
+      "ease_q_invoice": "Fakturanı emal etmək nə qədər asan oldu?",
+      "email_l": "E-poçt ünvanınız",
+      "order_l": "Sifariş nömrəsi (isteğe bağlı)",
+      "feedback_l": "Nəyi daha yaxşı edə bilərik? (isteğe bağlı)",
+      "submit": "Göndər"
+    },
+    "bn": {
+      "header": "গ্রাহকের মতামত",
+      "header_quote": "উদ্ধৃতি মতামত",
+      "header_delivery": "সরবরাহ মতামত",
+      "header_invoice": "চালান মতামত",
+      "nps_q": "আপনি কি সহকর্মীকে হোলসিম সুপারিশ করবেন?",
+      "nps_q_quote": "এই উদ্ধৃতির ভিত্তিতে, আপনি কি হোলসিম সুপারিশ করবেন?",
+      "nps_q_delivery": "এই সরবরাহের ভিত্তিতে, আপনি কি হোলসিম সুপারিশ করবেন?",
+      "nps_q_invoice": "এই চালানের ভিত্তিতে, আপনি কি হোলসিম সুপারিশ করবেন?",
+      "ease_q": "আপনার সমস্যাটি সমাধান করা কতটা সহজ ছিল?",
+      "ease_q_quote": "এই উদ্ধৃতিটি পাওয়া কতটা সহজ ছিল?",
+      "ease_q_delivery": "এই সরবরাহটি গ্রহণ করা কতটা সহজ ছিল?",
+      "ease_q_invoice": "এই চালানটি প্রসেস করা কতটা সহজ ছিল?",
+      "email_l": "আপনার ইমেল ঠিকানা",
+      "order_l": "অর্ডার নম্বর (ঐচ্ছিক)",
+      "feedback_l": "আমরা আরও কী ভালো করতে পারি? (ঐচ্ছিক)",
+      "submit": "জমা দিন"
+    }
+  },
+  "markets": [
+    { "region": "Europe", "country": "United Kingdom", "code": "en" },
+    { "region": "Europe", "country": "Switzerland", "code": "de" },
+    { "region": "Europe", "country": "France", "code": "fr" },
+    { "region": "Europe", "country": "Germany", "code": "de" },
+    { "region": "Europe", "country": "Belgium", "code": "fr" },
+    { "region": "Europe", "country": "Austria", "code": "de" },
+    { "region": "Europe", "country": "Bulgaria", "code": "bg" },
+    { "region": "Europe", "country": "Croatia", "code": "hr" },
+    { "region": "Europe", "country": "Czech Republic", "code": "cs" },
+    { "region": "Europe", "country": "Greece", "code": "el" },
+    { "region": "Europe", "country": "Hungary", "code": "hu" },
+    { "region": "Europe", "country": "Italy", "code": "it" },
+    { "region": "Europe", "country": "Poland", "code": "pl" },
+    { "region": "Europe", "country": "Romania", "code": "ro" },
+    { "region": "Europe", "country": "Serbia", "code": "sr" },
+    { "region": "Europe", "country": "Slovakia", "code": "sk" },
+    { "region": "Europe", "country": "Spain", "code": "es" },
+    { "region": "Europe", "country": "Azerbaijan", "code": "az" },
+    { "region": "Latin America", "country": "Argentina", "code": "es" },
+    { "region": "Latin America", "country": "Brazil", "code": "pt" },
+    { "region": "Latin America", "country": "Colombia", "code": "es" },
+    { "region": "Latin America", "country": "Costa Rica", "code": "es" },
+    { "region": "Latin America", "country": "Ecuador", "code": "es" },
+    { "region": "Latin America", "country": "El Salvador", "code": "es" },
+    { "region": "Latin America", "country": "Guatemala", "code": "es" },
+    { "region": "Latin America", "country": "Mexico", "code": "es" },
+    { "region": "Latin America", "country": "Nicaragua", "code": "es" },
+    { "region": "Latin America", "country": "Peru", "code": "es" },
+    { "region": "Middle East & Africa", "country": "Algeria", "code": "fr" },
+    { "region": "Middle East & Africa", "country": "Cameroon", "code": "fr" },
+    { "region": "Middle East & Africa", "country": "Egypt", "code": "ar" },
+    { "region": "Middle East & Africa", "country": "Iraq", "code": "ar" },
+    { "region": "Middle East & Africa", "country": "Jordan", "code": "ar" },
+    { "region": "Middle East & Africa", "country": "Lebanon", "code": "ar" },
+    { "region": "Middle East & Africa", "country": "Morocco", "code": "fr" },
+    { "region": "Asia Pacific", "country": "Australia", "code": "en" },
+    { "region": "Asia Pacific", "country": "New Zealand", "code": "en" },
+    { "region": "Asia Pacific", "country": "Bangladesh", "code": "bn" }
+  ]
+}
