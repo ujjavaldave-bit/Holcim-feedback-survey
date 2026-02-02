@@ -43,8 +43,6 @@
         .star-btn { background: none; border: none; cursor: pointer; padding: 2px; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
         .star-btn svg { width: 28px; height: 28px; transition: all 0.2s; }
         .star-fill { fill: var(--star-empty); }
-        
-        /* The "Dancing" Logic - Fixed Hover States */
         .star-btn.active .star-fill, .star-btn.hover-active .star-fill { fill: var(--star-filled); }
         .star-btn:hover { transform: scale(1.2); }
         
@@ -52,8 +50,7 @@
         .badge { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 16px; background: #ecfdf5; color: #059669; opacity: 0; transition: 0.3s; }
         .badge.show { opacity: 1; }
         
-        .form-input { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.2s; }
-        .form-input:focus { border-color: var(--holcim-blue); }
+        .form-input { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; }
         .submit-btn { width: 100%; padding: 16px; background: var(--holcim-gradient); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         .success-view { display: none; text-align: center; padding: 48px 24px; }
         .success-view.show { display: block; }
@@ -125,7 +122,9 @@
     <script>
     (function() {
         'use strict';
+        // ALWAYS VERIFY NGROK URL
         const CONFIG = { API: 'https://mesne-unpreclusively-dana.ngrok-free.dev/submit' };
+        
         const state = { nps: null, ease: null, globalData: null };
         const starSVG = '<svg viewBox="0 0 24 24"><path class="star-fill" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
 
@@ -168,7 +167,7 @@
             
             let headerText = t.header, npsText = t.nps_q, easeText = t.ease_q;
 
-            // Context-Aware Content
+            // Specialized Content Check
             if (type === 'quote') {
                 headerText = t.header_quote || t.header;
                 npsText = t.nps_q_quote || t.nps_q;
@@ -183,14 +182,15 @@
                 easeText = t.ease_q_invoice || t.ease_q;
             }
 
-            // Zara's Feedback: Dynamic Reference Labels
+            // Dynamic Reference Labels (Zara's Feedback)
             const orderLabel = document.getElementById('orderLabel');
             const orderInput = document.getElementById('orderRef');
+            
             if (type === 'quote') {
-                orderLabel.textContent = (langCode === 'ar' ? "رقم العرض" : "Quote Number");
+                orderLabel.textContent = t.quote_l || "Quote Number";
                 orderInput.placeholder = "e.g. QT-9988";
             } else if (type === 'invoice') {
-                orderLabel.textContent = (langCode === 'ar' ? "رقم الفاتورة" : "Invoice Number");
+                orderLabel.textContent = t.invoice_l || "Invoice Number";
                 orderInput.placeholder = "e.g. INV-7766";
             } else {
                 orderLabel.textContent = t.order_l;
