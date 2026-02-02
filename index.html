@@ -39,6 +39,16 @@
         }
         #languagePicker option { color: black; }
 
+        .location-badge {
+            font-size: 10px;
+            margin-top: 12px;
+            background: rgba(255,255,255,0.15);
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            opacity: 0.9;
+        }
+
         .form-body { padding: 24px; }
         .form-section { margin-bottom: 24px; }
         .section-label { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: block; }
@@ -69,16 +79,21 @@
     <div class="card">
         <header class="header">
             <div class="lang-nav">
-                <select id="languagePicker"></select>
+                <select id="languagePicker">
+                    <option value="" disabled selected>Detecting location...</option>
+                </select>
             </div>
             <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Holcim_Logo_2021_sRGB.png" alt="Holcim" class="holcim-logo">
             <p class="header-title">Customer Feedback</p>
+            <div id="locationStatus" class="location-badge" style="display: none;">
+                📍 <span id="detectedCountry"></span>
+            </div>
         </header>
 
         <div id="formView" class="form-body">
             <form id="csatForm" novalidate>
                 <div class="form-section">
-                    <label class="section-label" id="npsLabel"></label>
+                    <label class="section-label" id="npsLabel">How likely are you to recommend Holcim to a colleague? <span style="color:#dc2626">*</span></label>
                     <div class="rating-container">
                         <div class="star-row" id="npsStars"></div>
                         <div class="badge" id="npsBadge">Selected</div>
@@ -86,7 +101,7 @@
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="easeLabel"></label>
+                    <label class="section-label" id="easeLabel">How easy was it to resolve your inquiry today? <span style="color:#dc2626">*</span></label>
                     <div class="rating-container">
                         <div class="star-row" id="easeStars"></div>
                         <div class="badge" id="easeBadge">Selected</div>
@@ -94,21 +109,21 @@
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="emailLabel"></label>
+                    <label class="section-label" id="emailLabel">Your email address <span style="color:#dc2626">*</span></label>
                     <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="orderLabel"></label>
+                    <label class="section-label" id="orderLabel">Order/Shipment Number (optional)</label>
                     <input type="text" id="orderRef" class="form-input" placeholder="e.g. ORD-12345">
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="feedbackLabel"></label>
+                    <label class="section-label" id="feedbackLabel">What could we do better? (optional)</label>
                     <textarea id="feedback" class="form-input" rows="3" placeholder="..."></textarea>
                 </div>
 
-                <button type="submit" class="submit-btn" id="submitBtn"></button>
+                <button type="submit" class="submit-btn" id="submitBtn">Submit Feedback</button>
             </form>
         </div>
 
@@ -134,6 +149,7 @@
 
         function setupStarRow(containerId, count, startAt0, stateKey, badgeId) {
             const container = document.getElementById(containerId);
+            if (!container) return;
             container.innerHTML = '';
             for (let i = (startAt0 ? 0 : 1); i <= count; i++) {
                 const btn = document.createElement('button');
@@ -142,8 +158,9 @@
                 btn.onclick = () => {
                     state[stateKey] = i;
                     refreshStars(container, i, 'active');
-                    document.getElementById(badgeId).classList.add('show');
-                    document.getElementById(badgeId).textContent = i + (startAt0 ? '/10' : '/5');
+                    const badge = document.getElementById(badgeId);
+                    badge.classList.add('show');
+                    badge.textContent = i + (startAt0 ? '/10' : '/5');
                 };
                 btn.onmouseenter = () => refreshStars(container, i, 'hover-active');
                 btn.onmouseleave = () => refreshStars(container, state[stateKey] ?? -1, 'hover-active');
@@ -152,7 +169,7 @@
         }
 
         function updateUI(langCode) {
-            if (!langCode) return;
+            if (!state.globalData || !langCode) return;
             const t = state.globalData.languages[langCode] || state.globalData.languages['en'];
             const params = new URLSearchParams(window.location.search);
             const type = (params.get('type') || '').toLowerCase();
@@ -184,25 +201,21 @@
             document.getElementById('feedbackLabel').textContent = t.feedback_l;
             document.getElementById('submitBtn').textContent = t.submit;
             
-            if(t.success_title) document.getElementById('successTitle').textContent = t.success_title;
-            if(t.success_msg) document.getElementById('successMsg').textContent = t.success_msg;
-
             document.body.style.direction = (langCode === 'ar') ? 'rtl' : 'ltr';
         }
 
         async function init() {
             try {
+                // Initialize Stars
+                setupStarRow('npsStars', 10, true, 'nps', 'npsBadge');
+                setupStarRow('easeStars', 5, false, 'ease', 'easeBadge');
+
+                // Load Translations
                 const response = await fetch('translations.json');
                 state.globalData = await response.json();
 
                 const picker = document.getElementById('languagePicker');
-                
-                const placeholder = document.createElement('option');
-                placeholder.textContent = "Select your location...";
-                placeholder.value = "";
-                placeholder.disabled = true;
-                placeholder.selected = true; 
-                picker.appendChild(placeholder);
+                picker.innerHTML = '<option value="" disabled selected>Select location...</option>';
 
                 const regions = ["Europe", "Latin America", "Middle East & Africa", "Asia Pacific"];
                 regions.forEach(region => {
@@ -219,6 +232,7 @@
 
                 picker.onchange = (e) => updateUI(e.target.value);
 
+                // Detection Logic
                 const params = new URLSearchParams(window.location.search);
                 const urlLang = params.get('lang');
 
@@ -234,6 +248,11 @@
                         if (match) {
                             picker.value = match.code;
                             updateUI(match.code);
+                            
+                            // Show the location badge
+                            const statusDiv = document.getElementById('locationStatus');
+                            statusDiv.style.display = 'inline-block';
+                            document.getElementById('detectedCountry').textContent = `Detected: ${ipData.country_name}`;
                         } else {
                             picker.value = 'en';
                             updateUI('en');
@@ -243,10 +262,6 @@
                         updateUI('en');
                     }
                 }
-
-                setupStarRow('npsStars', 10, true, 'nps', 'npsBadge');
-                setupStarRow('easeStars', 5, false, 'ease', 'easeBadge');
-
             } catch (err) {
                 console.error("Initialization failed", err);
             }
@@ -281,11 +296,9 @@
                 if (res.ok) {
                     document.getElementById('formView').style.display = 'none';
                     document.getElementById('successView').classList.add('show');
-                } else {
-                    throw new Error();
-                }
+                } else { throw new Error(); }
             } catch (err) {
-                alert('Connection Error: Ensure your backend is running.');
+                alert('Connection Error: Ensure backend is running.');
                 btn.disabled = false; btn.textContent = originalText;
             }
         };
