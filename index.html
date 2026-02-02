@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Customer Feedback | Holcim UK</title>
+    <title>Customer Feedback | Holcim Group</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -18,11 +18,26 @@
             --radius-lg: 20px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--background); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; }
+        body { font-family: 'Inter', sans-serif; background: var(--background); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; transition: direction 0.3s; }
         .card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 20px 50px rgba(29, 67, 112, 0.12); overflow: hidden; width: 100%; max-width: 520px; animation: slideUp 0.4s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .header { background: var(--holcim-gradient); padding: 28px; text-align: center; color: white; }
+        .header { background: var(--holcim-gradient); padding: 28px; text-align: center; color: white; position: relative; }
         .holcim-logo { height: 50px; filter: brightness(0) invert(1); margin-bottom: 10px; }
+        
+        /* Language Selector Styling */
+        .lang-nav { margin-bottom: 12px; display: flex; justify-content: center; }
+        #languagePicker { 
+            background: rgba(255, 255, 255, 0.2); 
+            color: white; 
+            border: 1px solid rgba(255, 255, 255, 0.3); 
+            padding: 4px 12px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            cursor: pointer;
+            outline: none;
+        }
+        #languagePicker option { color: black; }
+
         .form-body { padding: 24px; }
         .form-section { margin-bottom: 24px; }
         .section-label { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: block; }
@@ -34,34 +49,26 @@
         .star-fill { fill: var(--star-empty); }
         .star-btn.active .star-fill, .star-btn.hover-active .star-fill { fill: var(--star-filled); }
         .star-num { font-size: 9px; font-weight: 600; color: #888; margin-top: 2px; }
-        @keyframes pop { 50% { transform: scale(1.3); } }
-        .star-btn.pop { animation: pop 0.3s ease; }
         .badge { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 16px; background: #ecfdf5; color: #059669; opacity: 0; transition: 0.3s; }
         .badge.show { opacity: 1; }
         .form-input { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; }
         .submit-btn { width: 100%; padding: 16px; background: var(--holcim-gradient); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(29, 67, 112, 0.3); }
         .success-view { display: none; text-align: center; padding: 48px 24px; }
         .success-view.show { display: block; }
 
-        /* MOBILE FIXES */
         @media (max-width: 480px) {
-            body { padding: 12px; }
-            .card { border-radius: 16px; }
-            .form-body { padding: 16px; }
-            .star-row { gap: 1px !important; flex-wrap: nowrap !important; justify-content: space-between; }
-            #npsStars .star-btn svg { width: 22px !important; height: 22px !important; }
-            #npsStars .star-num { font-size: 8px; }
-            #easeStars .star-btn svg { width: 32px !important; height: 32px !important; }
-        }
-        @media (max-width: 340px) {
-            #npsStars .star-btn svg { width: 18px !important; height: 18px !important; }
+            .star-row { gap: 1px; justify-content: space-between; }
+            #npsStars .star-btn svg { width: 22px; height: 22px; }
         }
     </style>
 </head>
 <body>
     <div class="card">
         <header class="header">
+            <div class="lang-nav">
+                <select id="languagePicker">
+                    </select>
+            </div>
             <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Holcim_Logo_2021_sRGB.png" alt="Holcim" class="holcim-logo">
             <p class="header-title">Customer Feedback</p>
         </header>
@@ -69,7 +76,7 @@
         <div id="formView" class="form-body">
             <form id="csatForm" novalidate>
                 <div class="form-section">
-                    <label class="section-label" id="npsLabel">How likely are you to recommend Holcim UK to a colleague? <span style="color:#dc2626">*</span></label>
+                    <label class="section-label" id="npsLabel">How likely are you to recommend Holcim to a colleague? <span style="color:#dc2626">*</span></label>
                     <div class="rating-container">
                         <div class="star-row" id="npsStars"></div>
                         <div class="badge" id="npsBadge">Selected</div>
@@ -85,18 +92,18 @@
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label">Your email address <span style="color:#dc2626">*</span></label>
+                    <label class="section-label" id="emailLabel">Your email address <span style="color:#dc2626">*</span></label>
                     <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label">Order/Shipment Number (optional)</label>
+                    <label class="section-label" id="orderLabel">Order/Shipment Number (optional)</label>
                     <input type="text" id="orderRef" class="form-input" placeholder="e.g. ORD-12345">
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label">What could we do better? (optional)</label>
-                    <textarea id="feedback" class="form-input" rows="3" placeholder="Share your thoughts..."></textarea>
+                    <label class="section-label" id="feedbackLabel">What could we do better? (optional)</label>
+                    <textarea id="feedback" class="form-input" rows="3" placeholder="..."></textarea>
                 </div>
 
                 <button type="submit" class="submit-btn" id="submitBtn">Submit Feedback</button>
@@ -104,8 +111,8 @@
         </div>
 
         <div id="successView" class="success-view">
-            <h2>Thank You!</h2>
-            <p>Your feedback has been saved successfully.</p>
+            <h2 id="successTitle">Thank You!</h2>
+            <p id="successMsg">Your feedback has been saved successfully.</p>
         </div>
     </div>
 
@@ -113,7 +120,7 @@
     (function() {
         'use strict';
         const CONFIG = { API: 'https://mesne-unpreclusively-dana.ngrok-free.dev/submit' };
-        const state = { nps: null, ease: null };
+        const state = { nps: null, ease: null, globalData: null };
         const starSVG = '<svg viewBox="0 0 24 24"><path class="star-fill" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
 
         function refreshStars(container, val, className) {
@@ -125,16 +132,16 @@
 
         function setupStarRow(containerId, count, startAt0, stateKey, badgeId) {
             const container = document.getElementById(containerId);
+            container.innerHTML = ''; // Clear for language switching if needed
             for (let i = (startAt0 ? 0 : 1); i <= count; i++) {
                 const btn = document.createElement('button');
                 btn.type = 'button'; btn.className = 'star-btn'; btn.dataset.val = i;
                 btn.innerHTML = starSVG + `<span class="star-num">${i}</span>`;
                 btn.onclick = () => {
                     state[stateKey] = i;
-                    btn.classList.add('pop'); setTimeout(() => btn.classList.remove('pop'), 300);
                     refreshStars(container, i, 'active');
-                    const b = document.getElementById(badgeId);
-                    b.classList.add('show'); b.textContent = i + (startAt0 ? '/10' : '/5');
+                    document.getElementById(badgeId).classList.add('show');
+                    document.getElementById(badgeId).textContent = i + (startAt0 ? '/10' : '/5');
                 };
                 btn.onmouseenter = () => refreshStars(container, i, 'hover-active');
                 btn.onmouseleave = () => refreshStars(container, state[stateKey] ?? -1, 'hover-active');
@@ -142,64 +149,92 @@
             }
         }
 
+        function updateUI(langCode) {
+            const t = state.globalData.languages[langCode] || state.globalData.languages['en'];
+            
+            document.querySelector('.header-title').textContent = t.header;
+            document.getElementById('npsLabel').firstChild.textContent = t.nps_q + " ";
+            document.getElementById('easeLabel').firstChild.textContent = t.ease_q + " ";
+            document.getElementById('submitBtn').textContent = t.submit;
+            
+            // Handle RTL for Arabic
+            document.body.style.direction = (langCode === 'ar') ? 'rtl' : 'ltr';
+        }
+
+        async function init() {
+            try {
+                // 1. Fetch JSON file
+                const response = await fetch('translations.json');
+                state.globalData = await response.json();
+
+                // 2. Populate Dropdown
+                const picker = document.getElementById('languagePicker');
+                const regions = ["Europe", "Latin America", "Middle East & Africa", "Asia Pacific"];
+                
+                regions.forEach(region => {
+                    const group = document.createElement('optgroup');
+                    group.label = region;
+                    state.globalData.markets.filter(m => m.region === region).forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m.code;
+                        opt.textContent = m.country;
+                        group.appendChild(opt);
+                    });
+                    picker.appendChild(group);
+                });
+
+                picker.onchange = (e) => updateUI(e.target.value);
+
+                // 3. Initial View Setup
+                setupStarRow('npsStars', 10, true, 'nps', 'npsBadge');
+                setupStarRow('easeStars', 5, false, 'ease', 'easeBadge');
+
+                // 4. Handle URL Params (Language & OPCO auto-detect)
+                const params = new URLSearchParams(window.location.search);
+                const urlLang = params.get('lang') || 'en';
+                picker.value = urlLang;
+                updateUI(urlLang);
+
+            } catch (err) {
+                console.error("Critical: Could not load translations.json", err);
+            }
+        }
+
         document.getElementById('csatForm').onsubmit = async (e) => {
             e.preventDefault();
             if (state.nps === null || state.ease === null) return alert('Please complete the star ratings.');
+            
             const params = new URLSearchParams(window.location.search);
             const payload = {
                 type: params.get('type') || 'Service',
                 lob: params.get('lob') || 'Standard',
-                opco: params.get('opco') || 'Holcim UK', // New line to capture OPCO
+                opco: params.get('opco') || 'Holcim UK',
                 email: document.getElementById('email').value,
                 orderRef: document.getElementById('orderRef').value,
                 nps: state.nps,
                 ease: state.ease,
                 feedback: document.getElementById('feedback').value
             };
+
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.textContent = 'Sending...';
+            btn.disabled = true; btn.textContent = '...';
+
             try {
-             const res = await fetch(CONFIG.API, {
-    method: 'POST',
-    headers: { 
-        'Content-Type': 'application/json',
-        'X-API-KEY': 'Holcim-UK-Secure-2026' // This must match your Python key exactly
-    },
-    body: JSON.stringify(payload)
-});
+                const res = await fetch(CONFIG.API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-API-KEY': 'Holcim-UK-Secure-2026' },
+                    body: JSON.stringify(payload)
+                });
                 if (res.ok) {
                     document.getElementById('formView').style.display = 'none';
                     document.getElementById('successView').classList.add('show');
                 }
             } catch (err) {
-                alert('Connection Error: Ensure Python is running.');
-                btn.disabled = false; btn.textContent = 'Submit Feedback';
+                alert('Connection Error: Ensure Python & ngrok are active.');
+                btn.disabled = false; btn.textContent = 'Submit';
             }
         };
 
-        function init() {
-            setupStarRow('npsStars', 10, true, 'nps', 'npsBadge');
-            setupStarRow('easeStars', 5, false, 'ease', 'easeBadge');
-            const params = new URLSearchParams(window.location.search);
-            const type = (params.get('type') || '').toLowerCase();
-            const title = document.querySelector('.header-title');
-            const npsLabel = document.getElementById('npsLabel');
-            const easeLabel = document.getElementById('easeLabel');
-
-            if (type === 'quote') {
-                title.textContent = 'Quote Feedback';
-                npsLabel.innerHTML = 'Based on this quote experience, how likely are you to recommend Holcim UK to a colleague? <span style="color:#dc2626">*</span>';
-                easeLabel.innerHTML = 'How easy was it to get this quote? <span style="color:#dc2626">*</span>';
-            } else if (type === 'delivery') {
-                title.textContent = 'Delivery Feedback';
-                npsLabel.innerHTML = 'Based on this delivery, how likely are you to recommend Holcim UK to a colleague? <span style="color:#dc2626">*</span>';
-                easeLabel.innerHTML = 'How easy was it to receive this delivery? <span style="color:#dc2626">*</span>';
-            } else if (type === 'invoice') {
-                title.textContent = 'Invoice Feedback';
-                npsLabel.innerHTML = 'Based on your invoicing experience, how likely are you to recommend Holcim UK to a colleague? <span style="color:#dc2626">*</span>';
-                easeLabel.innerHTML = 'How easy was it to process this invoice? <span style="color:#dc2626">*</span>';
-            }
-        }
         init();
     })();
     </script>
