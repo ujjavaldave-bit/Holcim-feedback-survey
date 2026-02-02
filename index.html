@@ -43,6 +43,8 @@
         .star-btn { background: none; border: none; cursor: pointer; padding: 2px; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
         .star-btn svg { width: 28px; height: 28px; transition: all 0.2s; }
         .star-fill { fill: var(--star-empty); }
+        
+        /* The "Dancing" Logic - Fixed Hover States */
         .star-btn.active .star-fill, .star-btn.hover-active .star-fill { fill: var(--star-filled); }
         .star-btn:hover { transform: scale(1.2); }
         
@@ -50,7 +52,8 @@
         .badge { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 16px; background: #ecfdf5; color: #059669; opacity: 0; transition: 0.3s; }
         .badge.show { opacity: 1; }
         
-        .form-input { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; }
+        .form-input { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.2s; }
+        .form-input:focus { border-color: var(--holcim-blue); }
         .submit-btn { width: 100%; padding: 16px; background: var(--holcim-gradient); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         .success-view { display: none; text-align: center; padding: 48px 24px; }
         .success-view.show { display: block; }
@@ -141,6 +144,7 @@
                 const btn = document.createElement('button');
                 btn.type = 'button'; btn.className = 'star-btn'; btn.dataset.val = i;
                 btn.innerHTML = starSVG + `<span class="star-num">${i}</span>`;
+                
                 btn.onclick = () => {
                     state[stateKey] = i;
                     refreshStars(container, i, 'active');
@@ -148,8 +152,10 @@
                     badge.classList.add('show');
                     badge.textContent = i + (startAt0 ? '/10' : '/5');
                 };
+                
                 btn.onmouseenter = () => refreshStars(container, i, 'hover-active');
-                btn.onmouseleave = () => refreshStars(container, state[stateKey] ?? -1, 'hover-active');
+                btn.onmouseleave = () => refreshStars(container, state[stateKey] !== null ? state[stateKey] : -1, 'hover-active');
+                
                 container.appendChild(btn);
             }
         }
@@ -162,6 +168,7 @@
             
             let headerText = t.header, npsText = t.nps_q, easeText = t.ease_q;
 
+            // Context-Aware Content
             if (type === 'quote') {
                 headerText = t.header_quote || t.header;
                 npsText = t.nps_q_quote || t.nps_q;
@@ -176,15 +183,30 @@
                 easeText = t.ease_q_invoice || t.ease_q;
             }
 
+            // Zara's Feedback: Dynamic Reference Labels
+            const orderLabel = document.getElementById('orderLabel');
+            const orderInput = document.getElementById('orderRef');
+            if (type === 'quote') {
+                orderLabel.textContent = (langCode === 'ar' ? "رقم العرض" : "Quote Number");
+                orderInput.placeholder = "e.g. QT-9988";
+            } else if (type === 'invoice') {
+                orderLabel.textContent = (langCode === 'ar' ? "رقم الفاتورة" : "Invoice Number");
+                orderInput.placeholder = "e.g. INV-7766";
+            } else {
+                orderLabel.textContent = t.order_l;
+                orderInput.placeholder = "e.g. ORD-12345";
+            }
+
             document.querySelector('.header-title').textContent = headerText;
             document.getElementById('npsLabel').innerHTML = `${npsText} <span style="color:#dc2626">*</span>`;
             document.getElementById('easeLabel').innerHTML = `${easeText} <span style="color:#dc2626">*</span>`;
             document.getElementById('emailLabel').innerHTML = `${t.email_l} <span style="color:#dc2626">*</span>`;
-            document.getElementById('orderLabel').textContent = t.order_l;
             document.getElementById('feedbackLabel').textContent = t.feedback_l;
             document.getElementById('submitBtn').textContent = t.submit;
+            
             if(t.success_title) document.getElementById('successTitle').textContent = t.success_title;
             if(t.success_msg) document.getElementById('successMsg').textContent = t.success_msg;
+            
             document.body.style.direction = (langCode === 'ar') ? 'rtl' : 'ltr';
         }
 
@@ -271,7 +293,7 @@
                     document.getElementById('successView').classList.add('show');
                 } else { throw new Error(); }
             } catch (err) {
-                alert('Connection Error: Ensure backend is running.');
+                alert('Connection Error: Ensure backend and ngrok are active.');
                 btn.disabled = false; btn.textContent = originalText;
             }
         };
