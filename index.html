@@ -149,6 +149,7 @@
             const payload = {
                 type: params.get('type') || 'Service',
                 lob: params.get('lob') || 'Standard',
+                opco: params.get('opco') || 'Holcim UK', // New line to capture OPCO
                 email: document.getElementById('email').value,
                 orderRef: document.getElementById('orderRef').value,
                 nps: state.nps,
