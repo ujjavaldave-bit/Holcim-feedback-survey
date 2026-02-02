@@ -19,13 +19,26 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--background); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; transition: direction 0.3s; }
+        
         .card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 20px 50px rgba(29, 67, 112, 0.12); overflow: hidden; width: 100%; max-width: 520px; animation: slideUp 0.4s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
         .header { background: var(--holcim-gradient); padding: 28px; text-align: center; color: white; position: relative; }
         .holcim-logo { height: 50px; filter: brightness(0) invert(1); margin-bottom: 10px; }
+        
         .lang-nav { margin-bottom: 12px; display: flex; justify-content: center; }
-        #languagePicker { background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 4px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; outline: none; }
+        #languagePicker { 
+            background: rgba(255, 255, 255, 0.2); 
+            color: white; 
+            border: 1px solid rgba(255, 255, 255, 0.3); 
+            padding: 4px 12px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            cursor: pointer;
+            outline: none;
+        }
         #languagePicker option { color: black; }
+
         .form-body { padding: 24px; }
         .form-section { margin-bottom: 24px; }
         .section-label { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: block; }
@@ -36,12 +49,20 @@
         .star-fill { fill: var(--star-empty); }
         .star-btn.active .star-fill, .star-btn.hover-active .star-fill { fill: var(--star-filled); }
         .star-num { font-size: 9px; font-weight: 600; color: #888; margin-top: 2px; }
+        
         .badge { display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 16px; background: #ecfdf5; color: #059669; opacity: 0; transition: 0.3s; }
         .badge.show { opacity: 1; }
+        
         .form-input { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 12px; font-family: inherit; }
         .submit-btn { width: 100%; padding: 16px; background: var(--holcim-gradient); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        
         .success-view { display: none; text-align: center; padding: 48px 24px; }
         .success-view.show { display: block; }
+
+        @media (max-width: 480px) {
+            .star-row { gap: 1px; justify-content: space-between; }
+            #npsStars .star-btn svg { width: 22px; height: 22px; }
+        }
     </style>
 </head>
 <body>
@@ -57,7 +78,7 @@
         <div id="formView" class="form-body">
             <form id="csatForm" novalidate>
                 <div class="form-section">
-                    <label class="section-label" id="npsLabel">How likely are you to recommend Holcim to a colleague? <span style="color:#dc2626">*</span></label>
+                    <label class="section-label" id="npsLabel"></label>
                     <div class="rating-container">
                         <div class="star-row" id="npsStars"></div>
                         <div class="badge" id="npsBadge">Selected</div>
@@ -65,7 +86,7 @@
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="easeLabel">How easy was it to resolve your inquiry today? <span style="color:#dc2626">*</span></label>
+                    <label class="section-label" id="easeLabel"></label>
                     <div class="rating-container">
                         <div class="star-row" id="easeStars"></div>
                         <div class="badge" id="easeBadge">Selected</div>
@@ -73,21 +94,21 @@
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="emailLabel">Your email address <span style="color:#dc2626">*</span></label>
+                    <label class="section-label" id="emailLabel"></label>
                     <input type="email" id="email" class="form-input" placeholder="name@company.com" required>
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="orderLabel">Order/Shipment Number (optional)</label>
+                    <label class="section-label" id="orderLabel"></label>
                     <input type="text" id="orderRef" class="form-input" placeholder="e.g. ORD-12345">
                 </div>
 
                 <div class="form-section">
-                    <label class="section-label" id="feedbackLabel">What could we do better? (optional)</label>
+                    <label class="section-label" id="feedbackLabel"></label>
                     <textarea id="feedback" class="form-input" rows="3" placeholder="..."></textarea>
                 </div>
 
-                <button type="submit" class="submit-btn" id="submitBtn">Submit Feedback</button>
+                <button type="submit" class="submit-btn" id="submitBtn"></button>
             </form>
         </div>
 
@@ -131,38 +152,41 @@
         }
 
         function updateUI(langCode) {
+            if (!langCode) return;
             const t = state.globalData.languages[langCode] || state.globalData.languages['en'];
             const params = new URLSearchParams(window.location.search);
             const type = (params.get('type') || '').toLowerCase();
             
-            // Logic to handle Type Overrides (Quote/Delivery/Invoice) from JSON
             let headerText = t.header;
             let npsText = t.nps_q;
             let easeText = t.ease_q;
 
-            if (type === 'quote' && t.header_quote) {
-                headerText = t.header_quote;
-                npsText = t.nps_q_quote || npsText;
-                easeText = t.ease_q_quote || easeText;
-            } else if (type === 'delivery' && t.header_delivery) {
-                headerText = t.header_delivery;
-                npsText = t.nps_q_delivery || npsText;
-                easeText = t.ease_q_delivery || easeText;
-            } else if (type === 'invoice' && t.header_invoice) {
-                headerText = t.header_invoice;
-                npsText = t.nps_q_invoice || npsText;
-                easeText = t.ease_q_invoice || easeText;
+            if (type === 'quote') {
+                headerText = t.header_quote || t.header;
+                npsText = t.nps_q_quote || t.nps_q;
+                easeText = t.ease_q_quote || t.ease_q;
+            } else if (type === 'delivery') {
+                headerText = t.header_delivery || t.header;
+                npsText = t.nps_q_delivery || t.nps_q;
+                easeText = t.ease_q_delivery || t.ease_q;
+            } else if (type === 'invoice') {
+                headerText = t.header_invoice || t.header;
+                npsText = t.nps_q_invoice || t.nps_q;
+                easeText = t.ease_q_invoice || t.ease_q;
             }
 
             document.querySelector('.header-title').textContent = headerText;
-            document.getElementById('npsLabel').firstChild.textContent = npsText + " ";
-            document.getElementById('easeLabel').firstChild.textContent = easeText + " ";
+            document.getElementById('npsLabel').innerHTML = `${npsText} <span style="color:#dc2626">*</span>`;
+            document.getElementById('easeLabel').innerHTML = `${easeText} <span style="color:#dc2626">*</span>`;
+            document.getElementById('emailLabel').innerHTML = `${t.email_l} <span style="color:#dc2626">*</span>`;
             
-            document.getElementById('emailLabel').firstChild.textContent = t.email_l + " ";
             document.getElementById('orderLabel').textContent = t.order_l;
             document.getElementById('feedbackLabel').textContent = t.feedback_l;
             document.getElementById('submitBtn').textContent = t.submit;
             
+            if(t.success_title) document.getElementById('successTitle').textContent = t.success_title;
+            if(t.success_msg) document.getElementById('successMsg').textContent = t.success_msg;
+
             document.body.style.direction = (langCode === 'ar') ? 'rtl' : 'ltr';
         }
 
@@ -172,8 +196,16 @@
                 state.globalData = await response.json();
 
                 const picker = document.getElementById('languagePicker');
-                const regions = ["Europe", "Latin America", "Middle East & Africa", "Asia Pacific"];
                 
+                // Add Placeholder
+                const placeholder = document.createElement('option');
+                placeholder.textContent = "Select your location...";
+                placeholder.value = "";
+                placeholder.disabled = true;
+                placeholder.selected = true; 
+                picker.appendChild(placeholder);
+
+                const regions = ["Europe", "Latin America", "Middle East & Africa", "Asia Pacific"];
                 regions.forEach(region => {
                     const group = document.createElement('optgroup');
                     group.label = region;
@@ -188,16 +220,37 @@
 
                 picker.onchange = (e) => updateUI(e.target.value);
 
+                // LOGIC: URL Params > IP Geo-Detect > Fallback English
+                const params = new URLSearchParams(window.location.search);
+                const urlLang = params.get('lang');
+
+                if (urlLang && state.globalData.languages[urlLang]) {
+                    picker.value = urlLang;
+                    updateUI(urlLang);
+                } else {
+                    try {
+                        const ipResponse = await fetch('https://ipapi.co/json/');
+                        const ipData = await ipResponse.json();
+                        const match = state.globalData.markets.find(m => m.country === ipData.country_name);
+                        
+                        if (match) {
+                            picker.value = match.code;
+                            updateUI(match.code);
+                        } else {
+                            picker.value = 'en';
+                            updateUI('en');
+                        }
+                    } catch (e) {
+                        picker.value = 'en';
+                        updateUI('en');
+                    }
+                }
+
                 setupStarRow('npsStars', 10, true, 'nps', 'npsBadge');
                 setupStarRow('easeStars', 5, false, 'ease', 'easeBadge');
 
-                const params = new URLSearchParams(window.location.search);
-                const urlLang = params.get('lang') || 'en';
-                picker.value = urlLang;
-                updateUI(urlLang);
-
             } catch (err) {
-                console.error("Critical: Could not load translations.json", err);
+                console.error("Initialization failed", err);
             }
         }
 
@@ -209,7 +262,7 @@
             const payload = {
                 type: params.get('type') || 'Service',
                 lob: params.get('lob') || 'Standard',
-                opco: params.get('opco') || 'Holcim UK',
+                opco: params.get('opco') || 'Holcim Group',
                 email: document.getElementById('email').value,
                 orderRef: document.getElementById('orderRef').value,
                 nps: state.nps,
@@ -218,6 +271,7 @@
             };
 
             const btn = document.getElementById('submitBtn');
+            const originalText = btn.textContent;
             btn.disabled = true; btn.textContent = '...';
 
             try {
@@ -229,10 +283,12 @@
                 if (res.ok) {
                     document.getElementById('formView').style.display = 'none';
                     document.getElementById('successView').classList.add('show');
+                } else {
+                    throw new Error();
                 }
             } catch (err) {
-                alert('Connection Error: Ensure Python & ngrok are active.');
-                btn.disabled = false; btn.textContent = 'Submit';
+                alert('Connection Error: Ensure your backend is running.');
+                btn.disabled = false; btn.textContent = originalText;
             }
         };
 
