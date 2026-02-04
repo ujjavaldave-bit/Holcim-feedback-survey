@@ -11,7 +11,6 @@
             --holcim-gradient: linear-gradient(135deg, #1d4370 0%, #04bbf1 50%, #94c12e 100%);
             --surface: #ffffff;
             --background: #f4f6f8;
-            --text-primary: #1a1a2e;
             --border: #e2e6eb;
             --star-empty: #d1d5db;
             --star-filled: #fbbf24;
@@ -28,11 +27,11 @@
         
         .lang-nav { margin-bottom: 12px; display: flex; justify-content: center; min-height: 24px; }
         #languagePicker { 
+            display: none; /* Hidden by default */
             background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); 
             padding: 4px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; outline: none;
-            display: none; /* Hidden by default, shown by JS if non-English */
         }
-        #languagePicker option { color: black; }
+        #languagePicker option { color: #000; }
 
         .location-badge { font-size: 10px; margin-top: 12px; background: rgba(255,255,255,0.15); display: inline-block; padding: 4px 10px; border-radius: 12px; opacity: 0.9; }
 
@@ -41,7 +40,7 @@
         .section-label { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: block; }
         .rating-container { background: #f0f2f5; border-radius: 12px; padding: 16px; text-align: center; }
         .star-row { display: flex; justify-content: center; gap: 4px; }
-        .star-btn { background: none; border: none; cursor: pointer; padding: 2px; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+        .star-btn { background: none; border: none; cursor: pointer; padding: 2px; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; }
         .star-btn svg { width: 28px; height: 28px; transition: all 0.2s; }
         .star-fill { fill: var(--star-empty); }
         .star-btn.active .star-fill, .star-btn.hover-active .star-fill { fill: var(--star-filled); }
@@ -55,11 +54,6 @@
         .submit-btn { width: 100%; padding: 16px; background: var(--holcim-gradient); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         .success-view { display: none; text-align: center; padding: 48px 24px; }
         .success-view.show { display: block; }
-
-        @media (max-width: 480px) {
-            .star-row { gap: 1px; justify-content: space-between; }
-            #npsStars .star-btn svg { width: 22px; height: 22px; }
-        }
     </style>
 </head>
 <body>
@@ -159,12 +153,15 @@
             const params = new URLSearchParams(window.location.search);
             const type = (params.get('type') || '').toLowerCase();
             
-            // HIDE DROPDOWN FOR ENGLISH, SHOW FOR OTHERS
+            // --- HARD FIX FOR PICKER VISIBILITY ---
             const picker = document.getElementById('languagePicker');
-            picker.style.display = (langCode === 'en') ? 'none' : 'block';
+            if (langCode === 'en') {
+                picker.style.setProperty('display', 'none', 'important');
+            } else {
+                picker.style.setProperty('display', 'block', 'important');
+            }
 
             let headerText = t.header, npsText = t.nps_q, easeText = t.ease_q;
-
             if (type === 'quote') {
                 headerText = t.header_quote || t.header;
                 npsText = t.nps_q_quote || t.nps_q;
@@ -206,49 +203,59 @@
         async function init() {
             setupStarRow('npsStars', 10, true, 'nps', 'npsBadge');
             setupStarRow('easeStars', 5, false, 'ease', 'easeBadge');
-            const response = await fetch('translations.json');
-            state.globalData = await response.json();
-            const picker = document.getElementById('languagePicker');
-            picker.innerHTML = '<option value="" disabled selected>Select location...</option>';
-            ["Europe", "Latin America", "Middle East & Africa", "Asia Pacific"].forEach(region => {
-                const group = document.createElement('optgroup');
-                group.label = region;
-                state.globalData.markets.filter(m => m.region === region).forEach(m => {
-                    const opt = document.createElement('option');
-                    opt.value = m.code; opt.textContent = m.country;
-                    group.appendChild(opt);
+            
+            try {
+                const response = await fetch('translations.json');
+                state.globalData = await response.json();
+                
+                const picker = document.getElementById('languagePicker');
+                picker.innerHTML = '<option value="" disabled selected>Select location...</option>';
+                
+                ["Europe", "Latin America", "Middle East & Africa", "Asia Pacific"].forEach(region => {
+                    const group = document.createElement('optgroup');
+                    group.label = region;
+                    state.globalData.markets.filter(m => m.region === region).forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m.code; opt.textContent = m.country;
+                        group.appendChild(opt);
+                    });
+                    picker.appendChild(group);
                 });
-                picker.appendChild(group);
-            });
-            picker.onchange = (e) => updateUI(e.target.value);
-            const params = new URLSearchParams(window.location.search);
-            const urlLang = params.get('lang');
-            if (urlLang && state.globalData.languages[urlLang]) {
-                picker.value = urlLang; updateUI(urlLang);
-            } else {
-                try {
+                
+                picker.onchange = (e) => updateUI(e.target.value);
+                
+                const params = new URLSearchParams(window.location.search);
+                const urlLang = params.get('lang');
+                
+                if (urlLang && state.globalData.languages[urlLang]) {
+                    picker.value = urlLang;
+                    updateUI(urlLang);
+                } else {
                     const ipResponse = await fetch('https://ipapi.co/json/');
                     const ipData = await ipResponse.json();
                     const match = state.globalData.markets.find(m => m.country === ipData.country_name);
+                    
                     if (match) {
-                        picker.value = match.code; updateUI(match.code);
+                        picker.value = match.code;
+                        updateUI(match.code);
                         if (match.code !== 'en') {
                             document.getElementById('locationStatus').style.display = 'inline-block';
                             document.getElementById('detectedCountry').textContent = `Detected: ${ipData.country_name}`;
                         }
-                    } else { picker.value = 'en'; updateUI('en'); }
-                } catch (e) { picker.value = 'en'; updateUI('en'); }
-            }
+                    } else { 
+                        updateUI('en'); // Default and Hide
+                    }
+                }
+            } catch (e) { updateUI('en'); }
         }
 
         document.getElementById('csatForm').onsubmit = async (e) => {
             e.preventDefault();
-            if (state.nps === null || state.ease === null) return alert('Please complete the star ratings.');
-            const params = new URLSearchParams(window.location.search);
+            if (state.nps === null || state.ease === null) return alert('Please complete ratings.');
             const payload = {
-                type: params.get('type') || 'Service',
-                lob: params.get('lob') || 'Standard',
-                opco: params.get('opco') || 'Holcim Group',
+                type: new URLSearchParams(window.location.search).get('type') || 'Service',
+                lob: new URLSearchParams(window.location.search).get('lob') || 'Standard',
+                opco: new URLSearchParams(window.location.search).get('opco') || 'Holcim Group',
                 email: document.getElementById('email').value,
                 orderRef: document.getElementById('orderRef').value,
                 nps: state.nps,
@@ -256,7 +263,6 @@
                 feedback: document.getElementById('feedback').value
             };
             const btn = document.getElementById('submitBtn');
-            const originalText = btn.textContent;
             btn.disabled = true; btn.textContent = '...';
             try {
                 const res = await fetch(CONFIG.API, {
@@ -269,8 +275,8 @@
                     document.getElementById('successView').classList.add('show');
                 } else { throw new Error(); }
             } catch (err) {
-                alert('Connection Error: Ensure backend is running.');
-                btn.disabled = false; btn.textContent = originalText;
+                alert('Connection Error.');
+                btn.disabled = false; btn.textContent = 'Submit';
             }
         };
         init();
